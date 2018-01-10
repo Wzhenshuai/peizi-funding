@@ -1,0 +1,103 @@
+/***
+Fontawesome Icons
+***/
+
+[class^="fa-"],
+[class^="glyphicon-"],
+[class*=" fa-"],
+[class*=" glyphicon-"] {
+  display: inline-block;
+  margin-top: 1px;
+  font-size: $icon-size-normal;
+  *margin-right: .3em;
+  line-height: $icon-size-normal;
+}
+
+/* Make font awesome icons fixed width */
+
+li [class^="fa-"],
+li [class^="glyphicon-"],
+li [class*=" fa-"],
+li [class*=" glyphicon-"] {
+  display: inline-block;
+  width: 1.25em; 
+  text-align: center;
+}
+
+li [class^="glyphicon-"],
+li [class*=" glyphicon-"] {  
+  top: 2px;
+}
+
+li [class^="fa-"].icon-large,
+li [class^="glyphicon-"].icon-large,
+li [class*=" fa-"].icon-large,
+li [class*=" glyphicon-"].icon-large {
+  /* increased font size for icon-large */
+  width: 1.5625em;
+}
+
+/* Icon sizing */
+
+.fa-lg,
+.icon-lg {
+  font-size: 16px;
+}
+
+.fa-2x {
+  font-size: 2em;
+}
+
+.fa-3x {
+  font-size: 3em;
+}
+
+.fa-4x {
+  font-size: 4em;
+}
+
+.fa-5x {
+  font-size: 5em;
+}
+
+/* Icon coloring */
+
+.icon-default {
+  color: $brand-default;
+}
+
+.icon-success {
+  color: $brand-success;
+}
+
+.icon-info {
+  color: $brand-info; 
+}
+
+.icon-warning {
+  color: $brand-warning;
+}
+
+.icon-danger {
+  color: $brand-danger;
+}
+
+/***
+Font Awesome 4.x Demo
+***/
+
+.fa-item {
+    font-size: 14px;
+    padding: 10px 10px 10px 20px;
+
+    i {
+        font-size: 16px;
+        display: inline-block;
+        width: 20px;
+    }
+
+    &:hover {
+        cursor: pointer;
+        background: #eee;
+    }
+}

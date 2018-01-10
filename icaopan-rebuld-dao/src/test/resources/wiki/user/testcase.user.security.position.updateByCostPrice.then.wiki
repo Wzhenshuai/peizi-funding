@@ -1,0 +1,6 @@
+|connect|
+|query|select * from user_security_position|
+|internal_security_id|available|amount|cost_price|
+|603309|1000|1000|2|
+|603319|1000|900|2.78|
+|603312|0|0|3|

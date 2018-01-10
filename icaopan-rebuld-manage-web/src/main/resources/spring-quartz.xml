@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans  xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:task="http://www.springframework.org/schema/task"
+
+	xsi:schemaLocation="http://www.springframework.org/schema/beans  
+                        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd  
+                        http://www.springframework.org/schema/task
+						http://www.springframework.org/schema/task/spring-task-3.0.xsd">
+
+	<task:annotation-driven />
+	<task:scheduled-tasks>
+		<task:scheduled ref="commonTask" method="clearPlacmentCheckMap" cron="0 30 23 * * MON-FRI"/>
+		<task:scheduled ref="clearingService" method="clearingProcessTask" cron="0 00 23 * * MON-FRI"/>
+		<task:scheduled ref="securityService" method="updateAll" cron="0 5 9 * * MON-FRI"/>
+		<task:scheduled ref="poolService" method="updateStockSecurity" cron="0 8 9 * * MON-FRI"/>
+		<!-- 中午休市用户持仓和通道持仓做对账-->
+		<task:scheduled ref="checkLogService" method="checkPosition" cron="0 0 12 * * MON-FRI"/>
+
+		<!-- 每日扣除资金方费用 -->
+		<task:scheduled ref="customerService" method="updateCustomerBalanceDay" cron="0 30 23 * * MON-FRI"/>
+		<!-- 每月扣除资金方抵消 -->
+		<task:scheduled ref="customerService" method="updateCustomerBalanceMonthly" cron="0 30 1 1 * ?"/>
+		<!-- 风控大盘用户数据刷新 -->
+		<task:scheduled ref="riskTaskService" method="scheduledFlush" cron="0/30 * 9-15 ? * MON-FRI"/>
+		<!-- 风控大盘未购买股票用户信息刷新 -->
+		<task:scheduled ref="riskTaskService" method="positionComplementaryFlush" cron="0 0/10 9-15 ? * MON-FRI"/>
+		
+		<!-- 自动成交扫描 -->
+		<task:scheduled ref="channelPlacementService" method="autoFill" cron="*/3 * 9-15 * * MON-FRI"/>
+	</task:scheduled-tasks>
+</beans>

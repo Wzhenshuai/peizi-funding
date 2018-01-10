@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.icaopan.trade.dao.ChannelPlacementHistoryMapper">
+    <resultMap id="BaseResultMap" type="com.icaopan.trade.model.ChannelPlacementHistory">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="security_code" jdbcType="VARCHAR" property="securityCode"/>
+        <result column="security_name" jdbcType="VARCHAR" property="securityName"/>
+        <result column="side" jdbcType="VARCHAR" property="side"/>
+        <result column="user_name" jdbcType="VARCHAR" property="userName"/>
+        <result column="channelName" jdbcType="VARCHAR" property="channelName"/>
+        <result column="customerName" jdbcType="VARCHAR" property="customerName"/>
+        <result column="quantity" jdbcType="DECIMAL" property="quantity"/>
+        <result column="price" jdbcType="DECIMAL" property="price"/>
+        <result column="amount" jdbcType="DECIMAL" property="amount"/>
+        <result column="fill_quantity" jdbcType="DECIMAL" property="fillQuantity"/>
+        <result column="fill_amount" jdbcType="DECIMAL" property="fillAmount"/>
+        <result column="fill_price" jdbcType="DECIMAL" property="fillPrice"/>
+        <result column="status" jdbcType="VARCHAR" property="status"/>
+        <result column="account" jdbcType="VARCHAR" property="account"/>
+        <result column="placement_code" jdbcType="VARCHAR" property="placementCode"/>
+        <result column="reject_message" jdbcType="VARCHAR" property="rejectMessage"/>
+        <result column="date_time" jdbcType="TIMESTAMP" property="dateTime"/>
+        <result column="channel_id" jdbcType="INTEGER" property="channelId"/>
+        <result column="channel_placement_id" jdbcType="INTEGER" property="channelPlacementId"/>
+        <result column="customer_id" jdbcType="INTEGER" property="customerId"/>
+        <result column="placement_id" jdbcType="INTEGER" property="placementId"/>
+        <result column="user_id" jdbcType="INTEGER" property="userId"/>
+        <result column="sys_commission_fee" jdbcType="DECIMAL" property="sysCommissionFee"/>
+        <result column="trade_commission_fee" jdbcType="DECIMAL" property="tradeCommissionFee"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, security_code, side, quantity, price, amount, fill_quantity, fill_amount, fill_price,
+        status, account, placement_code, reject_message, date_time, channel_id,
+        channel_placement_id,customer_id, placement_id, user_id,sys_commission_fee,trade_commission_fee
+    </sql>
+    <select id="selectByPage" parameterType="com.icaopan.util.page.Page" resultMap="BaseResultMap">
+        select
+        tcph.id,
+        security_code,
+        side,
+        quantity,
+        price,
+        tcph.amount,
+        fill_quantity,
+        fill_amount,
+        fill_price,
+        tcph.STATUS,
+        account,
+        placement_code,
+        reject_message,
+        date_time,
+        tcph.channel_id,
+        channel_placement_id,
+        tcph.customer_id,
+        placement_id,
+        user_id,
+        trade_commission_fee,
+        sys_commission_fee,
+        u.user_name username,
+        tc.`name` channelName,
+        c.`name` customerName,
+        sc.name  security_name
+        from trade_channel_placement_history tcph
+        LEFT JOIN `user` u ON tcph.user_id = u.id
+        LEFT JOIN trade_channel tc ON tc.id = tcph.channel_id
+        LEFT JOIN customer c ON c.id = tcph.customer_id
+        LEFT JOIN stock_security sc on sc.code=tcph.security_code
+        where 1 = 1
+        <if test="params.securityCode != null and params.securityCode != '' ">
+            and tcph.security_code = #{params.securityCode}
+        </if>
+        <if test="params.side != null and params.side != '' ">
+            and tcph.side = #{params.side}
+        </if>
+        <if test="params.status != null and params.status != '' ">
+            and tcph.status = #{params.status}
+        </if>
+        <if test="params.account != null and params.account != '' ">
+            and tcph.account = #{params.account}
+        </if>
+        <if test="params.channelId != null and params.channelId != '' ">
+            and tcph.channel_id = #{params.channelId}
+        </if>
+        <if test="params.customerId != null and params.customerId != '' ">
+            and tcph.customer_id = #{params.customerId}
+        </if>
+        <if test="params.userId != null and params.userId != '' ">
+            and u.id = #{params.userId}
+        </if>
+        <if test="params.placementId != null and params.placementId != '' ">
+            and tcph.placement_id = #{params.placementId}
+        </if>
+        <if test="params.userName != null and params.userName != '' ">
+            and u.user_name = #{params.userName}
+        </if>
+        <if test="params.startTime != null and params.startTime != '' ">
+            <![CDATA[
+    		and	date(tcph.date_time) >= date(#{params.startTime})
+    	]]>
+        </if>
+        <if test="params.endTime != null and params.startTime != '' ">
+            <![CDATA[
+           and  date(tcph.date_time) <= date(#{params.endTime})
+         ]]>
+        </if>
+        ORDER BY date_time DESC
+    </select>
+
+    <insert id="insert" parameterType="com.icaopan.trade.model.ChannelPlacementHistory">
+        insert into trade_channel_placement_history ( security_code, side,
+        quantity, price, amount,
+        fill_quantity, fill_amount, fill_price,
+        status, account, placement_code,
+        reject_message, date_time, channel_id,
+        channel_placement_id, customer_id, placement_id,
+        user_id,sys_commission_fee,trade_commission_fee)
+        values ( #{securityCode,jdbcType=VARCHAR}, #{side,jdbcType=VARCHAR},
+        #{quantity,jdbcType=DECIMAL}, #{price,jdbcType=DECIMAL}, #{amount,jdbcType=DECIMAL},
+        #{fillQuantity,jdbcType=DECIMAL}, #{fillAmount,jdbcType=DECIMAL}, #{fillPrice,jdbcType=DECIMAL},
+        #{status,jdbcType=VARCHAR}, #{account,jdbcType=VARCHAR}, #{placementCode,jdbcType=VARCHAR},
+        #{rejectMessage,jdbcType=VARCHAR}, now(), #{channelId,jdbcType=INTEGER},
+        #{channelPlacementId,jdbcType=INTEGER}, #{customerId,jdbcType=INTEGER}, #{placementId,jdbcType=INTEGER},
+        #{userId,jdbcType=INTEGER},#{item.sysCommissionFee,jdbcType=DECIMAL},#{item.tradeCommissionFee,jdbcType=DECIMAL})
+    </insert>
+
+    <insert id="insertList" parameterType="java.util.List">
+        INSERT INTO trade_channel_placement_history(
+        security_code, side, quantity,
+        price , amount, fill_quantity,
+        fill_amount , fill_price, status,
+        account , placement_code,reject_message ,
+        date_time , channel_id, placement_id,
+        customer_id ,user_id, channel_placement_id,
+        sys_commission_fee,trade_commission_fee)
+        values
+        <foreach collection="ChannelPlacementHistoryList" item="item" index="index" separator=",">
+            (
+            #{item.securityCode,jdbcType=VARCHAR}, #{item.side,jdbcType=VARCHAR},#{item.quantity,jdbcType=DECIMAL},
+            #{item.price,jdbcType=DECIMAL},#{item.amount,jdbcType=DECIMAL},#{item.fillQuantity,jdbcType=DECIMAL},
+            #{item.fillAmount,jdbcType=DECIMAL},#{item.fillPrice,jdbcType=DECIMAL},#{item.status,jdbcType=VARCHAR},
+            #{item.account,jdbcType=VARCHAR},#{item.placementCode,jdbcType=VARCHAR},#{item.rejectMessage,jdbcType=VARCHAR},
+            #{item.dateTime},#{item.channelId,jdbcType=INTEGER},#{item.placementId,jdbcType=INTEGER},
+            #{item.customerId,jdbcType=INTEGER},#{item.userId,jdbcType=INTEGER},#{item.channelPlacementId,jdbcType=INTEGER},
+            #{item.sysCommissionFee,jdbcType=DECIMAL},#{item.tradeCommissionFee,jdbcType=DECIMAL}
+            )
+        </foreach>
+    </insert>
+
+    <select id="selectCommissionCollectBypage" parameterType="com.icaopan.util.page.Page"
+            resultType="com.icaopan.trade.model.ChannelBalanceCollect">
+        SELECT
+        tc.`name` AS channelName,
+        tc.trade_commission_rate AS tradeCommissionRate,
+        tc.tatio AS sysCommissionRate,
+        SUM(tp.fill_amount) AS fillAmount,
+        SUM(tp.sys_commission_fee) AS sysCommissionFee,
+        SUM(tp.trade_commission_fee) AS tradeCommissionFee
+        FROM
+        trade_channel_placement_history tp
+        LEFT JOIN trade_channel tc ON tc.id = tp.channel_id
+        WHERE 1 = 1
+        <if test="params.customerId != null and params.customerId != '' ">
+            and tp.customer_id = #{params.customerId}
+        </if>
+        <if test="params.channelId != null and params.channelId != '' ">
+            and tp.channel_id = #{params.channelId}
+        </if>
+        <if test="params.startTime != null and params.startTime != '' ">
+            <![CDATA[
+    		and	date(date_time) >= date(#{params.startTime})
+    	]]>
+        </if>
+        <if test="params.endTime != null and params.startTime != '' ">
+            <![CDATA[
+           and  date(date_time) <= date(#{params.endTime})
+         ]]>
+        </if>
+        GROUP BY tp.channel_id
+    </select>
+</mapper>

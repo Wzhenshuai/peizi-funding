@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.icaopan.stock.dao.StockSecurityMapper">
+    <resultMap id="BaseResultMap" type="com.icaopan.stock.model.StockSecurity">
+        <id column="internal_security_id" jdbcType="VARCHAR" property="internalSecurityId"/>
+        <result column="exchange_code" jdbcType="VARCHAR" property="exchangeCode"/>
+        <result column="code" jdbcType="VARCHAR" property="code"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime"/>
+        <result column="issue_date" jdbcType="TIMESTAMP" property="issueDate"/>
+        <result column="suspension_flag" jdbcType="TINYINT" property="suspensionFlag"/>
+        <result column="first_letter" jdbcType="VARCHAR" property="firstLetter"/>
+    </resultMap>
+    
+    <resultMap id="BaseResultMap2" type="com.icaopan.stock.model.StockSecuritySimple">
+        <result column="code" jdbcType="VARCHAR" property="code"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="suspension_flag" jdbcType="TINYINT" property="suspensionFlag"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        internal_security_id, exchange_code, code, name, modify_time, issue_date, suspension_flag,
+        first_letter
+    </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from stock_security
+        where internal_security_id = #{internalSecurityId,jdbcType=VARCHAR}
+    </select>
+
+    <insert id="insert" parameterType="com.icaopan.stock.model.StockSecurity">
+        insert into stock_security (internal_security_id, exchange_code,
+        code, name, modify_time,
+        issue_date, suspension_flag, first_letter
+        )
+        values (#{internalSecurityId,jdbcType=VARCHAR}, #{exchangeCode,jdbcType=VARCHAR},
+        #{code,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, now(),
+        #{issueDate,jdbcType=TIMESTAMP}, #{suspensionFlag}, #{firstLetter,jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <insert id="insertBatch" parameterType="java.util.List">
+        INSERT INTO stock_security
+        (internal_security_id, exchange_code,
+        code, name, modify_time,
+        issue_date, suspension_flag, first_letter)
+        VALUES
+        <foreach collection="list" item="record" separator=",">
+            (
+            #{record.internalSecurityId},#{record.exchangeCode},#{record.code},#{record.name},
+            now(),#{record.modifyTime},
+            #{record.suspensionFlag},
+            #{record.firstLetter}
+            )
+        </foreach>
+    </insert>
+
+    <select id="findAllByPage" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM stock_security
+        WHERE 1=1
+        <if test="params.exchangeCode != null">
+            AND exchange_code = #{params.exchangeCode}
+        </if>
+        <if test="params.code!=null">
+            AND code = #{params.code}
+        </if>
+        <if test="params.name != null">
+            AND name LIKE '%${params.name}%'
+        </if>
+        <if test="params.suspensionFlag != null">
+            AND suspension_flag = #{params.suspensionFlag}
+        </if>
+        ORDER BY modify_time
+    </select>
+
+    <select id="findAllStockSecurity" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM stock_security
+    </select>
+    
+    <select id="findAllStockCode" resultType="java.lang.String">
+    	select code
+    	from stock_security
+    </select>
+    
+    <select id="findAllStockSecurityByExchange" resultMap="BaseResultMap2">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM stock_security
+        where 1=1
+        <if test="exchange != null and exchange!=''">
+            AND exchange_code = #{exchange}
+        </if>
+    </select>
+
+    <select id="findByNameAndCode" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM stock_security
+        WHERE 1=1
+        <if test="name != null">
+            AND name = #{name}
+        </if>
+        <if test="code != null">
+            AND code = #{code}
+        </if>
+    </select>
+
+    <select id="findByCodeStartIndex" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM stock_security
+        WHERE 1=1
+        <if test="codeStartIndex != null">
+            AND internal_security_id LIKE '${codeStartIndex}%'
+        </if>
+    </select>
+
+    <update id="update" parameterType="com.icaopan.stock.model.StockSecurity">
+        UPDATE stock_security
+        <set>
+            <if test="firstLetter != null">
+                first_letter = #{firstLetter},
+            </if>
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="suspensionFlag != null">
+                suspension_flag = #{suspensionFlag},
+            </if>
+            modify_time = now()
+        </set>
+        WHERE internal_security_id = #{internalSecurityId}
+    </update>
+
+
+</mapper>

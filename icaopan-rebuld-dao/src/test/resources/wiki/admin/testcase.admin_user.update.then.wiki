@@ -1,0 +1,5 @@
+|connect|
+
+|query|select * from admin_user|
+|qq|
+|254983885|

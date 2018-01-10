@@ -1,0 +1,7 @@
+|connect|
+|query|select * from channel_security_position|
+|internal_security_id|available|amount|channel_id|cost_price|
+|603309|1000|0|2|2|
+|603308|0|2020|1|1|
+|603432|8000.0|0.0|2|9527|
+|690432|0|0|2|2|

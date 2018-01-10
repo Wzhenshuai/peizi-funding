@@ -1,0 +1,8 @@
+|connect|
+|clean table|admin_role|
+
+|insert|admin_role|
+|id|rolename|roledesc|
+|1|管理员|管理员|
+
+|commit|

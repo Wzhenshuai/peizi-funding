@@ -1,0 +1,9 @@
+|connect|
+
+|query|select * from trade_fill|
+|security_code|quantity|side|price|amount|account|placement_code|fill_code|channel_id|user_id|channel_placement_id|customer_id|placement_id|
+|600022|1000|BUY|12.23|12230|1002003001|200161128|110200161128|50001|101|20001|60011|60022|
+
+|commit|
+
+

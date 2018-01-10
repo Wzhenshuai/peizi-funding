@@ -1,0 +1,8 @@
+|connect|
+|clean table|sys_dict|
+
+|insert|sys_dict|
+|id|value|label|type|description|del_flag|sort|
+|1|已报|委托状态|placement_type|委托状态|0|0|
+
+|commit|

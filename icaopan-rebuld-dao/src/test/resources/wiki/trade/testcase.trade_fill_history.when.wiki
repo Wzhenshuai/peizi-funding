@@ -1,0 +1,8 @@
+|connect|
+|clean table|trade_fill_history|
+
+|insert|trade_fill_history|
+|security_code|quantity|price|amount|side|account|placement_code|fill_code|user_id|channel_placement_id|customer_id|channel_id|fill_id|placement_id|
+|600022|1000|12.23|12230|SELL|1002003001|200161128|110200161128|101|20001|40001|50001|60001|70001|
+
+|commit|

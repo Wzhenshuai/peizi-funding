@@ -1,0 +1,7 @@
+|connect|
+
+|query|select * from admin_user|
+|user_name|email|
+|zhangsan|zhang@email.com|
+|lisi|lisi@email.com|
+

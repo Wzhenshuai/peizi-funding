@@ -1,0 +1,9 @@
+|connect|
+|clean table|tdx_personal_user_manage|
+|insert|tdx_personal_user_manage|
+|id|o_name|account_no|trade_account|tx_password|jy_password|gddm_sz|gddm_sh|warn_line|open_line|dll_name|status|last_operate|remark|update_by|update_time|modify_time|customer_id|server_ip|server_port|server_name|version|yyb_name|yyb_code|broker_name|total_amount|available|error_Info|
+|1|金融证券|5124213|234324|32434|21334|0198327780|A460852242|250|250|trade_2000004241|Normal||||2017-07-11 13:45:59|2017-07-11 13:45:59|0002|59.40.79.53|7708|五矿证券电信委托主站|6.00|B北京地区|20||0.00|0.00|密码错误|
+|2|个人证券|5124213|234324|32434|21334|0198327780|A460852242|250|250|trade_2000024241|Normal||||2017-07-11 13:45:59|2017-07-11 13:45:59|0002|59.40.79.53|7708|五矿证券电信委托主站|6.10|B北京地区|50||0.20|0.20|密asd码错误|
+|3|平安证券|5124213|234324|32434|21334|0198327780|A460852242|210|230|trade_202004241|Normal||||2017-07-11 13:45:59|2017-07-11 13:45:59|0002|59.40.79.53|7708|五矿证券电信委托主站|6.00|B北京地区|20||0.10|0.40|密码错误|
+
+|commit|

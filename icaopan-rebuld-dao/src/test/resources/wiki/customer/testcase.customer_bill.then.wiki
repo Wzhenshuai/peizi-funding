@@ -1,0 +1,5 @@
+|connect|
+
+|query|select * from customer_bill|
+|channel_id|operation_type|balance|fill_amount|fee|operation_user|customer_id|
+|20001|null|299800.00|3000|-200.000|张三|101|

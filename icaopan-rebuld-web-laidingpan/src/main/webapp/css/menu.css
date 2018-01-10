@@ -1,0 +1,65 @@
+@charset "utf-8";
+/* CSS Document */
+.menu { color:#272727; height:37px; border-bottom:#ccc solid 1px; margin-top:30px;}
+.menu ul { height:37px; margin-left:10px;}
+.menu li {display:inline; line-height:36px; height:36px; position:relative; z-index:23; }
+.menu li a {color:#000000; text-decoration:none; padding:8px 30px; height:14px; border-left:1px solid #d7d7d7; border-right:1px solid #d7d7d7;  border-top:1px solid #d7d7d7; border-bottom:0px solid #d7d7d7;font-size:16px; background:#f9f9f9; position:relative; z-index:233;}
+.menu li a.tabactive {border-left:1px solid #d7d7d7; border-right:1px solid #d7d7d7; height:14px; border-top:1px solid #d7d7d7; border-bottom:0px solid #fff; background-color:#fff; color:#ff7826; position:relative; z-index:233;}
+#tabcontent1,#tabcontent2,#tabcontent3,#tabcontent4 {border:0px solid #ececec; width:100%; text-align:center;padding:6px 0px; font-size:12px; margin-bottom:5px;}
+
+
+
+
+.xszq .menu_2 { color:#272727; border-bottom:#ccc solid 0px;  float:left; width:130px; margin-top:30px;}
+.xszq .menu_2 ul { height:37px;}
+.xszq .menu_2 li { line-height:36px; height:36px; position:relative; z-index:23; }
+.xszq .menu_2 li a {color:#000000; text-decoration:none; padding:8px 30px; height:14px; border-left:1px solid #d7d7d7; border-right:1px solid #d7d7d7;  border-top:1px solid #d7d7d7; border-bottom:1px solid #d7d7d7;font-size:16px; background:#fff; position:relative; z-index:233;}
+.xszq .menu_2 li a.tabactive {border-left:1px solid #d7d7d7; border-right:1px solid #d7d7d7; height:14px; border-top:1px solid #d7d7d7; border-bottom:1px solid #d7d7d7; background-color:#fff; color:#ff7826; position:relative; z-index:233;}
+.xszq #tabcontent1,.xszq #tabcontent2,.xszq #tabcontent3,.xszq #tabcontent4 {border:1px solid #ececec; width:760px; padding:0px 40px 30px 40px; font-size:12px; margin-top:29px; margin-bottom:80px; text-align:left; float:right; background:#fff;} 
+.xszq h1{ font-size:20px; line-height:50px; border-bottom:1px solid #ececec;}
+.xszq h3{ font-size:15px; line-height:50px; color:#333333;}
+.xszq p{ line-height:24px; color:#666666; font-size:14px;}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#con {
+	color:#272727;  margin-top:30px;
+}
+#tags { height:36px; margin-left:10px; 
+}
+#tags li {
+	 FLOAT: left; MARGIN-RIGHT: 4px; LIST-STYLE-TYPE: none; line-height:36px; height:36px;
+}
+#tags li a {
+	color:#000000; text-decoration:none; padding:8px 30px; height:14px; border-left:1px solid #d7d7d7; border-right:1px solid #d7d7d7;  border-top:1px solid #d7d7d7; border-bottom:0px solid #d7d7d7;font-size:16px; background:#f9f9f9; position:relative; z-index:233;
+}
+#tags li.emptyTag {
+	BACKGROUND: none transparent scroll repeat 0% 0%; WIDTH: 4px
+}
+#tags li.selectTag {
+	BACKGROUND-POSITION: left top;  POSITION: relative; 
+}
+#tags li.selectTag a {
+	border-left:1px solid #d7d7d7; border-right:1px solid #d7d7d7; height:14px; border-top:1px solid #d7d7d7; border-bottom:1px solid #fff; background-color:#fff; color:#ff7826; position:relative; z-index:233;
+}
+#tagContent {
+	 PADDING-RIGHT: 1px; PADDING-LEFT: 1px; PADDING-BOTTOM: 1px;  PADDING-TOP: 1px; 
+}
+.tagContent {
+	 DISPLAY: none;   PADDING-BOTTOM: 80px; WIDTH: 700px; COLOR: #474747; PADDING-TOP: 10px; 
+}
+#tagContent div.selectTag {
+	DISPLAY: block
+}
+

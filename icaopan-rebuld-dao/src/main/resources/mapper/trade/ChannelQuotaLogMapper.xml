@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.icaopan.trade.dao.ChannelQuotaLogMapper">
+  <resultMap id="BaseResultMap" type="com.icaopan.trade.bean.ChannelQuotaLog">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="channel_id" jdbcType="INTEGER" property="channelId" />
+    <result column="operate_type" jdbcType="VARCHAR" property="operateType" />
+    <result column="quota_type" jdbcType="VARCHAR" property="quotaType" />
+    <result column="quota" jdbcType="DECIMAL" property="quota" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+  <sql id="Base_Column_List">
+      ql.id, ql.user_id, ql.channel_id, ql.operate_type, ql.quota_type, ql.quota, ql.create_time, ql.remark,
+      u.user_name AS "userName",c.name AS "customerName",c.id AS "customerId",tc.name AS "channelName"
+  </sql>
+
+  <sql id="join">
+    LEFT JOIN user u ON u.id = ql.user_id
+    LEFT JOIN trade_channel tc ON tc.id = ql.channel_id
+    LEFT JOIN customer c ON c.id = tc.customer_id
+  </sql>
+
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+      <include refid="Base_Column_List" />
+    from trade_channel_quota_log ql
+      <include refid="join"/>
+    where ql.id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <select id="selectByPage" resultMap="BaseResultMap">
+    select
+      <include refid="Base_Column_List" />
+    from trade_channel_quota_log ql
+      <include refid="join"/>
+    where 1 = 1
+    <if test="params.id != null">
+      AND ql.id = #{params.id,jdbcType=INTEGER}
+    </if>
+    <if test="params.customerId != null">
+      AND tc.customer_id = #{params.customerId,jdbcType=INTEGER}
+    </if>
+    <if test="params.channelId != null">
+      AND ql.channel_id = #{params.channelId,jdbcType=INTEGER}
+    </if>
+    <if test="params.userName != null and params.userName != ''">
+      AND u.user_name = #{params.userName,jdbcType=VARCHAR}
+    </if>
+    ORDER BY ql.create_time DESC
+  </select>
+
+  <insert id="insert" parameterType="com.icaopan.trade.bean.ChannelQuotaLog">
+    insert into trade_channel_quota_log (user_id, channel_id,
+      operate_type, quota_type, quota, 
+      create_time, remark)
+    values (#{userId,jdbcType=INTEGER}, #{channelId,jdbcType=INTEGER},
+      #{operateType,jdbcType=VARCHAR}, #{quotaType,jdbcType=VARCHAR}, #{quota,jdbcType=DECIMAL}, 
+      now(), #{remark,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.icaopan.trade.bean.ChannelQuotaLog">
+    insert into trade_channel_quota_log
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="userId != null">
+        user_id,
+      </if>
+      <if test="channelId != null">
+        channel_id,
+      </if>
+      <if test="operateType != null">
+        operate_type,
+      </if>
+      <if test="quotaType != null">
+        quota_type,
+      </if>
+      <if test="quota != null">
+        quota,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="remark != null">
+        remark,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="userId != null">
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="channelId != null">
+        #{channelId,jdbcType=INTEGER},
+      </if>
+      <if test="operateType != null">
+        #{operateType,jdbcType=VARCHAR},
+      </if>
+      <if test="quotaType != null">
+        #{quotaType,jdbcType=VARCHAR},
+      </if>
+      <if test="quota != null">
+        #{quota,jdbcType=DECIMAL},
+      </if>
+      <if test="createTime != null">
+        now(),
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+</mapper>

@@ -1,0 +1,8 @@
+|connect|
+|query|select * from tdx_personal_user_manage|
+|id|account_no|trade_account|
+|1|5124213|234324|
+|2|5124213|234324|
+|3|5124213|234324|
+|4|32434|32434|
+

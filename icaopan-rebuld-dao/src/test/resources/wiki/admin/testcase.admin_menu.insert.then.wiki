@@ -1,0 +1,6 @@
+|connect|
+
+|query|select * from admin_menu|
+|id|menu_parent|menu_code|menu_name|menu_url|menu_clazz|menu_order|menu_hidden|
+|2|0|user_manage2|用户管理2|/userFind2|0|0|1|
+|1|0|user_manage|用户管理|/userFind|0|0|1|

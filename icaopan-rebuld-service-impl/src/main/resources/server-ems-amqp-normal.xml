@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="GBK"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:context="http://www.springframework.org/schema/context" 
+	   xmlns:int="http://www.springframework.org/schema/integration"
+	   xmlns:int-amqp="http://www.springframework.org/schema/integration/amqp"
+	   xmlns:int-event="http://www.springframework.org/schema/integration/event"
+	   xmlns:rabbit="http://www.springframework.org/schema/rabbit"
+	   xmlns:task="http://www.springframework.org/schema/task"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+			http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+	   		http://www.springframework.org/schema/context 
+			http://www.springframework.org/schema/context/spring-context-3.1.xsd
+			http://www.springframework.org/schema/rabbit
+			http://www.springframework.org/schema/rabbit/spring-rabbit-1.2.xsd
+			http://www.springframework.org/schema/integration
+			http://www.springframework.org/schema/integration/spring-integration.xsd
+			http://www.springframework.org/schema/integration/amqp
+			http://www.springframework.org/schema/integration/amqp/spring-integration-amqp.xsd
+			http://www.springframework.org/schema/integration/event
+	        http://www.springframework.org/schema/integration/event/spring-integration-event.xsd
+			http://www.springframework.org/schema/task
+			http://www.springframework.org/schema/task/spring-task-3.0.xsd
+			">
+	<context:property-placeholder/>
+	<rabbit:template id="amqpTemplate" connection-factory="connectionFactory" reply-timeout="15000"/>
+	<rabbit:connection-factory id="connectionFactory" host="${server.rabbitmq.host:10.10.159.122}" username="${server.rabbitmq.username:zheshang}" password="${server.rabbitmq.password:ZheShang}"/>
+	<rabbit:admin connection-factory="connectionFactory"/>
+
+    <!-- 客户端同步调用server统一消息队列 -->
+    <rabbit:queue name="ems.execution.zheshang" >
+        <rabbit:queue-arguments >
+            <entry key="x-message-ttl">
+                <value type="java.lang.Long">60000</value>
+            </entry>
+            <entry key="x-dead-letter-exchange" value="ems.execution.dlx" />
+            <entry key="x-dead-letter-routing-key" value="zheshang" />
+        </rabbit:queue-arguments>
+    </rabbit:queue>
+
+	<!-- 超时未处理的消息进入死队列 -->
+	<rabbit:queue name="ems.execution.dlq.zheshang" />
+	<rabbit:direct-exchange name="ems.execution.dlx">
+		<rabbit:bindings>
+			<rabbit:binding queue="ems.execution.dlq.zheshang" key="zheshang" />
+		</rabbit:bindings>
+	</rabbit:direct-exchange>
+	
+	<rabbit:queue name="ems.execution.unrounting"/>
+
+	<!-- execution docking -->
+	<bean id="executionExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+		<property name="corePoolSize" value="10" />
+		<property name="maxPoolSize" value="20" />
+		<property name="queueCapacity" value="50" />
+		<property name="threadNamePrefix" value="manual-execution-mq-task"/>
+	</bean>
+	<bean id="executionContainer" class="org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer">
+		<property name="queueNames" value="${queue.execution:elf.execution.manual.execution.queue2}" />
+		<property name="connectionFactory" ref="connectionFactory" />
+		<property name="defaultRequeueRejected" value="false" />
+		<property name="taskExecutor" ref="executionExecutor"/>
+	</bean>
+	<int-amqp:inbound-channel-adapter channel="executionFromRabbit" listener-container="executionContainer"/>
+	<int:channel id="executionFromRabbit" />
+	<int:chain input-channel="executionFromRabbit">
+		<int:service-activator ref="emsService" method="dockPlacementCallBack" />
+	</int:chain>
+
+	<!-- report docking -->
+	<bean id="fillExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+		<property name="corePoolSize" value="10" />
+		<property name="maxPoolSize" value="20" />
+		<property name="queueCapacity" value="50" />
+		<property name="threadNamePrefix" value="manual-fill-mq-task"/>
+	</bean>
+	<bean id="fillContainer" class="org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer">
+		<property name="queueNames" value="${queue.fill:elf.execution.manual.fill.queue2}" />
+		<property name="connectionFactory" ref="connectionFactory" />
+		<property name="defaultRequeueRejected" value="false" />
+		<property name="taskExecutor" ref="fillExecutor"/>
+	</bean>
+	<int-amqp:inbound-channel-adapter channel="fillFromRabbit" listener-container="fillContainer"/>
+	<int:channel id="fillFromRabbit" />
+	<int:chain input-channel="fillFromRabbit">
+		<int:service-activator ref="emsService" method="dockFillCallBack" />
+	</int:chain>
+
+	<!-- report position -->
+	<bean id="positionExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+		<property name="corePoolSize" value="10" />
+		<property name="maxPoolSize" value="20" />
+		<property name="queueCapacity" value="50" />
+		<property name="threadNamePrefix" value="manual-position-mq-task"/>
+	</bean>
+	<bean id="positionContainer" class="org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer">
+		<property name="queueNames" value="${queue.cash.position:elf.execution.manual.cash.position.report.queue2}" />
+		<property name="connectionFactory" ref="connectionFactory" />
+		<property name="defaultRequeueRejected" value="false" />
+		<property name="taskExecutor" ref="positionExecutor"/>
+	</bean>
+	<int-amqp:inbound-channel-adapter channel="positionFromRabbit" listener-container="positionContainer"/>
+	<int:channel id="positionFromRabbit" />
+	<int:chain input-channel="positionFromRabbit">
+		<int:service-activator ref="emsService" method="dockPositionCallBack" />
+	</int:chain>
+	
+	
+	<!-- 通道委托对账 -->
+	<bean id="channelPlacementCheckExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+		<property name="corePoolSize" value="10" />
+		<property name="maxPoolSize" value="20" />
+		<property name="queueCapacity" value="50" />
+		<property name="threadNamePrefix" value="manual-execution-mq-task"/>
+	</bean>
+	<bean id="channelPlacementCheckContainer" class="org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer">
+		<property name="queueNames" value="${queue.clearing.execution:elf.execution.manual.clearing.execution}" />
+		<property name="connectionFactory" ref="connectionFactory" />
+		<property name="defaultRequeueRejected" value="false" />
+		<property name="taskExecutor" ref="channelPlacementCheckExecutor"/>
+	</bean>
+	<int-amqp:inbound-channel-adapter channel="channelPlacementFromRabbit" listener-container="channelPlacementCheckContainer"/>
+	<int:channel id="channelPlacementFromRabbit" />
+	<int:chain input-channel="channelPlacementFromRabbit">
+		<int:service-activator ref="emsService" method="channelPlacementCheck" />
+	</int:chain>
+	
+	<!-- 通道证券头寸对账 -->
+	<bean id="channelPositionCheckExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+		<property name="corePoolSize" value="10" />
+		<property name="maxPoolSize" value="20" />
+		<property name="queueCapacity" value="50" />
+		<property name="threadNamePrefix" value="manual-execution-mq-task"/>
+	</bean>
+	<bean id="channelPositionCheckContainer" class="org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer">
+		<property name="queueNames" value="${queue.clearing.position:elf.execution.manual.clearing.position}" />
+		<property name="connectionFactory" ref="connectionFactory" />
+		<property name="defaultRequeueRejected" value="false" />
+		<property name="taskExecutor" ref="channelPositionCheckExecutor"/>
+	</bean>
+	<int-amqp:inbound-channel-adapter channel="channelPositionFromRabbit" listener-container="channelPositionCheckContainer"/>
+	<int:channel id="channelPositionFromRabbit" />
+	<int:chain input-channel="channelPositionFromRabbit">
+		<int:service-activator ref="emsService" method="channelPositionCheck" />
+	</int:chain>
+</beans>

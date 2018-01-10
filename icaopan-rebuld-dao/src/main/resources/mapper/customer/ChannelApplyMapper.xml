@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.icaopan.customer.dao.ChannelApplyMapper">
+    <resultMap id="BaseResultMap" type="com.icaopan.customer.model.ChannelApply">
+        <result column="security_name" jdbcType="VARCHAR" property="securityName"/>
+        <result column="cash_account" jdbcType="VARCHAR" property="cashAccount"/>
+        <result column="trade_account" jdbcType="VARCHAR" property="tradeAccount"/>
+        <result column="jy_pass" jdbcType="VARCHAR" property="jyPass"/>
+        <result column="tx_pass" jdbcType="VARCHAR" property="txPass"/>
+        <result column="yyb_name" jdbcType="VARCHAR" property="yybName"/>
+        <result column="status" jdbcType="CHAR" property="status"/>
+        <result column="notes" jdbcType="VARCHAR" property="notes"/>
+        <result column="admin_notes" jdbcType="VARCHAR" property="adminNotes"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="customer_id" jdbcType="INTEGER" property="customerId"/>
+    </resultMap>
+    <insert id="save">
+        INSERT INTO  channel_apply(
+          security_name, cash_account, trade_account,
+           jy_pass, tx_pass,yyb_name,
+           customer_id,status, notes,
+           admin_notes,create_time
+        )VALUES (
+          #{securityName,jdbcType=VARCHAR},#{cashAccount,jdbcType=VARCHAR},#{tradeAccount,jdbcType=VARCHAR},
+          #{jyPass,jdbcType=VARCHAR},#{txPass,jdbcType=VARCHAR},#{yybName,jdbcType=VARCHAR},
+          #{customerId,jdbcType=INTEGER},#{status,jdbcType=CHAR},#{notes,jdbcType=VARCHAR},
+          #{adminNotes,jdbcType=VARCHAR},now()
+        )
+    </insert>
+    
+    <select id="queryByStatus" resultMap="BaseResultMap">
+        SELECT * FROM channel_apply
+        WHERE 1 =1
+        <if test="status !=null and status != '' ">
+           AND status = #{status,jdbcType=CHAR}
+        </if>
+        <if test="customerId !=null and customerId != 0 ">
+            AND customer_id = #{customerId}
+        </if>
+        order BY create_time
+    </select>
+    
+    <update id="updateStatus">
+        UPDATE channel_apply
+        <set>
+            status = #{status},
+            admin_notes = #{adminNotes},
+            update_time = now()
+        </set>
+        WHERE id = #{applyId}
+    </update>
+
+</mapper>

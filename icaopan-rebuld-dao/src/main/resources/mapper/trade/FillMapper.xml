@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.icaopan.trade.dao.FillMapper">
+    <resultMap id="BaseResultMap" type="com.icaopan.trade.model.Fill">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="security_code" jdbcType="VARCHAR" property="securityCode"/>
+        <result column="security_name" jdbcType="VARCHAR" property="securityName"/>
+        <result column="quantity" jdbcType="DECIMAL" property="quantity"/>
+        <result column="side" jdbcType="VARCHAR" property="side"/>
+        <result column="user_name" jdbcType="VARCHAR" property="userName"/>
+        <result column="channelName" jdbcType="VARCHAR" property="channelName"/>
+        <result column="customerName" jdbcType="VARCHAR" property="customerName"/>
+        <result column="price" jdbcType="DECIMAL" property="price"/>
+        <result column="amount" jdbcType="DECIMAL" property="amount"/>
+        <result column="fill_time" jdbcType="TIMESTAMP" property="fillTime"/>
+        <result column="account" jdbcType="VARCHAR" property="account"/>
+        <result column="placement_code" jdbcType="VARCHAR" property="placementCode"/>
+        <result column="fill_code" jdbcType="VARCHAR" property="fillCode"/>
+        <result column="user_id" jdbcType="INTEGER" property="userId"/>
+        <result column="channel_placement_id" jdbcType="INTEGER" property="channelPlacementId"/>
+        <result column="channel_id" jdbcType="INTEGER" property="channelId"/>
+        <result column="customer_id" jdbcType="INTEGER" property="customerId"/>
+        <result column="placement_id" jdbcType="INTEGER" property="placementId"/>
+    </resultMap>
+    <resultMap id="BaseResultMap2" type="com.icaopan.trade.model.Fill">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="security_code" jdbcType="VARCHAR" property="securityCode"/>
+        <result column="security_name" jdbcType="VARCHAR" property="securityName"/>
+        <result column="quantity" jdbcType="DECIMAL" property="quantity"/>
+        <result column="side" jdbcType="VARCHAR" property="side"/>
+        <result column="price" jdbcType="DECIMAL" property="price"/>
+        <result column="amount" jdbcType="DECIMAL" property="amount"/>
+        <result column="fill_time" jdbcType="TIMESTAMP" property="fillTime"/>
+        <result column="account" jdbcType="VARCHAR" property="account"/>
+        <result column="placement_code" jdbcType="VARCHAR" property="placementCode"/>
+        <result column="fill_code" jdbcType="VARCHAR" property="fillCode"/>
+        <result column="user_id" jdbcType="INTEGER" property="userId"/>
+        <result column="channel_placement_id" jdbcType="INTEGER" property="channelPlacementId"/>
+        <result column="channel_id" jdbcType="INTEGER" property="channelId"/>
+        <result column="customer_id" jdbcType="INTEGER" property="customerId"/>
+        <result column="placement_id" jdbcType="INTEGER" property="placementId"/>
+    </resultMap>
+    <resultMap id="BaseResultMap3" type="com.icaopan.trade.model.Fill">
+        <result column="amount" jdbcType="DECIMAL" property="amount"/>
+        <result column="channel_id" jdbcType="INTEGER" property="channelId"/>
+        <result column="customer_id" jdbcType="INTEGER" property="customerId"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, security_code, quantity, side, price, amount, fill_time, account,
+        placement_code, fill_code, user_id, channel_placement_id, channel_id,
+        customer_id, placement_id
+    </sql>
+
+    <select id="selectById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from trade_fill
+        where id = #{id}
+    </select>
+
+    <select id="selectFillByPage" resultMap="BaseResultMap">
+        select
+        tf.*,
+        u.user_name userName,
+        tc.name channelName,
+        c.name customerName,
+        sc.name security_name
+        from trade_fill tf
+        LEFT JOIN `user` u ON tf.user_id = u.id
+        LEFT JOIN trade_channel tc ON tc.id = tf.channel_id
+        LEFT JOIN customer c ON c.id = tf.customer_id
+        LEFT JOIN stock_security sc on sc.code=tf.security_code
+        where 1 = 1
+        <if test="params.securityCode != null and params.securityCode != '' ">
+            and tf.security_code = #{params.securityCode}
+        </if>
+        <if test="params.side != null and params.side != '' ">
+            and tf.side = #{params.side}
+        </if>
+        <if test="params.userId != null and params.userId != '' ">
+            and u.id = #{params.userId}
+        </if>
+        <if test="params.userName != null and params.userName != '' ">
+            and u.user_name = #{params.userName}
+        </if>
+        <if test="params.channelId != null and params.channelId != '' ">
+            and tf.channel_id = #{params.channelId}
+        </if>
+        <if test="params.customerId != null and params.customerId != '' ">
+            and tf.customer_id = #{params.customerId}
+        </if>
+        <if test="params.createDate != null and params.createDate != '' ">
+            <![CDATA[
+           and  date(tf.fill_time) = date(#{params.createDate})
+         ]]>
+        </if>
+        ORDER BY fill_time DESC
+    </select>
+
+    <select id="selectFill" resultMap="BaseResultMap2" parameterType="com.icaopan.trade.bean.FillDock">
+        select * from trade_fill
+        where 1=1
+        and placement_code = #{executionSno}
+        and fill_code=#{reportSno}
+        and account=#{account}
+        and price=#{price}
+        and quantity=#{quantity}
+        and side=#{side}
+        and DATE_FORMAT(fill_time,'Y-%m-%d')=DATE_FORMAT(#{createDate},'Y-%m-%d')
+    </select>
+
+    <select id="selectFillByPlacementAndFillCode" resultMap="BaseResultMap2">
+        select * from trade_fill
+        where 1=1
+        and placement_code = #{placementCode}
+        and fill_code=#{fillCode}
+        and account=#{account}
+    </select>
+
+    <insert id="insert" parameterType="com.icaopan.trade.model.Fill">
+        insert into trade_fill (security_code, quantity,
+        side, price, amount, fill_time,
+        account, placement_code, fill_code,
+        user_id, channel_placement_id, channel_id,
+        customer_id, placement_id)
+        values (#{securityCode,jdbcType=VARCHAR}, #{quantity,jdbcType=TIMESTAMP},
+        #{side,jdbcType=VARCHAR}, #{price,jdbcType=DECIMAL}, #{amount,jdbcType=DECIMAL}, #{fillTime,jdbcType=VARCHAR},
+        #{account,jdbcType=VARCHAR}, #{placementCode,jdbcType=VARCHAR}, #{fillCode,jdbcType=VARCHAR},
+        #{userId,jdbcType=INTEGER}, #{channelPlacementId,jdbcType=INTEGER}, #{channelId,jdbcType=INTEGER},
+        #{customerId,jdbcType=INTEGER}, #{placementId,jdbcType=INTEGER})
+    </insert>
+    <delete id="delete">
+        DELETE FROM trade_fill
+    </delete>
+
+    <select id="selectFillCollection" resultMap="BaseResultMap">
+        SELECT
+        tf.channel_id,
+        SUM(tf.amount) amount,
+        tf.customer_id
+        FROM
+        trade_fill tf LEFT JOIN trade_channel tc ON tf.channel_id = tc.id
+        GROUP BY
+        channel_id
+    </select>
+</mapper>

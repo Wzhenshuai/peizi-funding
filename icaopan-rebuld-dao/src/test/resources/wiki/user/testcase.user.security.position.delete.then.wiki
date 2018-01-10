@@ -1,0 +1,5 @@
+|connect|
+|query|select * from user_security_position|
+|internal_security_id|available|amount|
+|603309|1000|1000|
+|603319|1000|1000|

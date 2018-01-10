@@ -1,0 +1,10 @@
+|connect|
+|clean table|channel_security_position|
+|insert|channel_security_position|
+|id|internal_security_id|available|amount|channel_id|update_time|cost_price|user_id|customer_id|
+|1|603309|1000|0|2|2016-11-21 19:14:34|2|1|2|
+|2|603308|0|2020|1|2016-11-21 19:14:34|1|2|3|
+|3|603432|1200|2090|2|2016-11-21 19:14:34|5|3|2|
+|4|690433|0|0|2|2016-11-21 19:14:34|2|2|1|
+
+|commit|

@@ -1,0 +1,5 @@
+|connect|
+
+|query|select * from trade_placement_history|
+|security_code|side|quantity|price|amount|status|commission_fee|stampDuty_fee|transfer_fee|fill_quantity|fill_amount|fill_price|user_id|placement_id|customer_id|
+|600022|BUY|1000|12.23|12230|CANCELLING|5.1|5.1|5.1|1000|12230|12.23|1011|20011|30011|

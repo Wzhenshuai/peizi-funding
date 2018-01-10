@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.icaopan.sys.dao.LogMapper">
+    <resultMap id="BaseResultMap" type="com.icaopan.sys.model.Log">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="title" jdbcType="VARCHAR" property="title"/>
+        <result column="user_id" jdbcType="INTEGER" property="userId"/>
+        <result column="create_date" jdbcType="TIMESTAMP" property="createDate"/>
+        <result column="remote_addr" jdbcType="VARCHAR" property="remoteAddr"/>
+        <result column="user_agent" jdbcType="VARCHAR" property="userAgent"/>
+        <result column="request_uri" jdbcType="VARCHAR" property="requestUri"/>
+        <result column="method" jdbcType="VARCHAR" property="method"/>
+        <result column="params" jdbcType="VARCHAR" property="params"/>
+        <result column="user_name" jdbcType="VARCHAR" property="userName"/>
+
+    </resultMap>
+    <select id="selectByUserId" resultMap="BaseResultMap">
+        SELECT
+        *
+        FROM sys_log
+        WHERE user_id = #{userId}
+        ORDER BY create_date asc
+    </select>
+
+    <select id="findByLogParams" parameterType="com.icaopan.util.page.Page" resultMap="BaseResultMap">
+        SELECT sl.*,
+        au.user_name AS userName
+        FROM sys_log sl
+        LEFT JOIN admin_user au ON sl.user_id = au.id
+        WHERE 1 = 1
+        <if test="params.userName != null and params.userName != '' ">
+            AND user_name LIKE '%${params.userName}%'
+        </if>
+        <if test="params.customerId != null and params.customerId != '' ">
+            AND sl.user_id IN (
+            SELECT au.id FROM admin_user au
+            LEFT JOIN customer c ON au.customer_id = c.id
+            WHERE au.customer_id = #{params.customerId}
+            )
+        </if>
+        <if test="params.startTime != null and params.startTime != '' ">
+            <![CDATA[
+    		and	date(sl.create_date) >= date(#{params.startTime})
+    	]]>
+        </if>
+        <if test="params.endTime != null and params.startTime != '' ">
+            <![CDATA[
+           and  date(sl.create_date) <= date(#{params.endTime})
+         ]]>
+        </if>
+        ORDER BY sl.create_date DESC
+    </select>
+
+    <insert id="insert">
+        INSERT INTO sys_log(
+        title,
+        user_id,
+        create_date,
+        remote_addr,
+        user_agent,
+        request_uri,
+        params
+        ) VALUES (
+        #{title},
+        #{userId},
+        #{createDate},
+        #{remoteAddr},
+        #{userAgent},
+        #{requestUri},
+        #{params}
+        )
+    </insert>
+
+</mapper>

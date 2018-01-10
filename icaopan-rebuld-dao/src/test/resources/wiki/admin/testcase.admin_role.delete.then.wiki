@@ -1,0 +1,5 @@
+|connect|
+
+|query|select count(*) as r from admin_role|
+|r|
+|0|

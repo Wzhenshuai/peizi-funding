@@ -1,0 +1,4 @@
+|connect|
+|clean table|trade_fill|
+
+|commit|

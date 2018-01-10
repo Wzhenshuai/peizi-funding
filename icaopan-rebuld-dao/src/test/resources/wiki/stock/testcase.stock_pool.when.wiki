@@ -1,0 +1,11 @@
+|connect|
+|clean table|stock_pool|
+|insert|stock_pool|
+|id|stock_code|stock_name|modify_time|type|customer_id|
+|1|062000|iopqw|2016-11-18 17:21:56|1|2|
+|2|061000|sadsa|2016-11-15 17:21:56|2|1|
+|3|061020|somga|2016-11-15 17:21:56|1|2|
+|4|061300|ttpsa|2016-11-15 17:21:56|2|1|
+|5|065000|sppda|2016-11-15 17:21:56|1|2|
+
+|commit|

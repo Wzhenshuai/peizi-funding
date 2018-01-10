@@ -1,0 +1,11 @@
+|connect|
+|query|select * from stock_pool|
+|stock_code|stock_name|type|customer_id|
+|65535|iopqw|1|2|
+|061000|sadsa|2|1|
+|061020|somga|1|2|
+|061300|ttpsa|2|1|
+|065000|sppda|1|2|
+
+
+

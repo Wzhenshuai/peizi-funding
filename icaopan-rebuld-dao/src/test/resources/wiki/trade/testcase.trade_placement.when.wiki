@@ -1,0 +1,8 @@
+|connect|
+|clean table|trade_placement|
+
+|insert|trade_placement|
+|id|security_code|side|quantity|price|amount|status|is_sz_transfer_fee|fill_quantity|fill_amount|fill_price|ratio_fee|min_cost|user_id|customer_id|
+|11001|600022|BUY|1000|12.23|12230|SENDACK|1|1000|12230|12.23|0.0008|4000|101|60001|
+
+|commit|

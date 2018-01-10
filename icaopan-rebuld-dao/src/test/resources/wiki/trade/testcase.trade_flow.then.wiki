@@ -1,0 +1,5 @@
+|connect|
+
+|query|select * from trade_flow|
+|security_code|adjust_quantity|adjust_amount|type|cash|financing|cash_amount|financing_amount|user_id|customer_id|
+|600022|1000|12230|CASH_ADD|1000000|500000|1000000|500000|101|60011|

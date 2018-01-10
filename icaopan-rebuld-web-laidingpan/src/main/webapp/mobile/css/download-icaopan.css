@@ -1,0 +1,39 @@
+@charset "utf-8";
+/* CSS reset */
+html, body, ul, li, ol, dl, dd, dt, p, h1, h2, h3, h4, h5, h6, form, fieldset, legend, img, input{margin:0; padding:0;}
+fieldset,img{border:none;vertical-align:middle;}
+ul,ol{list-style:none;}
+a{text-decoration: none;}
+.clearfix:after{content:".";display:block;height:0;overflow:hidden;clear:both;}
+.clearfix{zoom:1;}
+.clearit{clear:both;height:0;font-size:0;overflow:hidden;}
+
+body{text-align: center; font-family: "黑体";
+ background-image:-webkit-linear-gradient(315deg, #f9cdc7,#fbf7f6,#f8d3ca);
+ background-image:-moz-linear-gradient(315deg, #f9cdc7,#fbf7f6,#f8d3ca);
+ background-image:-o-linear-gradient(315deg, #f9cdc7,#fbf7f6,#f8d3ca);
+ background-image:linear-gradient(315deg,#f9cdc7,#fbf7f6,#f8d3ca);
+}
+/*header*/
+header{height:3.65rem;padding-top:3.35rem;}
+header .logo{width:8.7rem;}
+
+.txt1{color:#666; font-size: 0.6rem; line-height: 1.1rem;}
+
+.btn-wrap{margin-top:1.8rem;}
+.button{display:inline-block; width:7rem;height:2.15rem; line-height: 2.15rem; color:#fff; font-size: 0.8rem; background-color: #ff4a4a; border-radius: 4px;}
+.MR08rem{margin-right:0.8em;}
+
+.cont{font-size: 0.8rem; color:#666; line-height: 1.2rem;}
+.cont .icon{display:block;width:4.325rem;margin:0 auto 0.9rem;}
+.cont1{ margin-top:2.15rem;}
+.cont2{ margin-top:0.8rem;}
+.cont3{ margin-top:1.5rem;}
+.cont1 .icon{height:3.875rem; background:url(../images/icon1.png) no-repeat; background-size: contain;}
+.cont2 .icon{height:3.725rem; background:url(../images/icon2.png) no-repeat; background-size: contain;}
+.cont3 .icon{height:3rem; background:url(../images/icon3.png) no-repeat; background-size: contain;}
+
+footer{height:3.6rem;padding-top:1.9rem; font-size: 0.6rem; color:#323232;}
+
+#floatLayer:before{content:'';display: block; width:16px;height:18px; position: absolute; right:8px;top:-18px; background: url(../images/corner.png) no-repeat;}
+#floatLayer{display:none;position:absolute;top:18px;right:3%; width:89%; height:4.8rem;padding:0.6rem 2.5%; background: rgba(255,74,74,0.9); border-radius: 4px; text-align: left; color:#fff; font-size: 0.6rem; line-height:0.9rem;}

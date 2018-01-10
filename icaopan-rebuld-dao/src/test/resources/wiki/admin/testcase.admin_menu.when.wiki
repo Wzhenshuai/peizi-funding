@@ -1,0 +1,8 @@
+|connect|
+|clean table|admin_menu|
+
+|insert|admin_menu|
+|id|menu_parent|menu_code|menu_name|menu_url|menu_clazz|menu_order|menu_hidden|
+|1|0|user_manage|用户管理|/userFind|0|0|1|
+
+|commit|

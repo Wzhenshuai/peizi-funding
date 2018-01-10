@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.icaopan.customer.dao.TdxConnectInfoMapper">
+    <resultMap id="BaseResultMap" type="com.icaopan.customer.model.TdxConnectInfo">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="account_no" jdbcType="VARCHAR" property="accountNo"/>
+        <result column="trade_account" jdbcType="VARCHAR" property="tradeAccount"/>
+        <result column="gddm_sz" jdbcType="VARCHAR" property="gddmSz"/>
+        <result column="gddm_sh" jdbcType="VARCHAR" property="gddmSh"/>
+        <result column="jy_password" jdbcType="VARCHAR" property="jyPassword"/>
+        <result column="tx_password" jdbcType="VARCHAR" property="txPassword"/>
+        <result column="ip" jdbcType="VARCHAR" property="ip"/>
+        <result column="port" jdbcType="VARCHAR" property="port"/>
+        <result column="version" jdbcType="VARCHAR" property="version"/>
+        <result column="yyb_id" jdbcType="VARCHAR" property="yybId"/>
+        <result column="exchange_id_sh" jdbcType="VARCHAR" property="exchangeIdSh"/>
+        <result column="exchange_id_sz" jdbcType="VARCHAR" property="exchangeIdSz"/>
+        <result column="o_name" jdbcType="VARCHAR" property="oName"/>
+        <result column="description" jdbcType="VARCHAR" property="description"/>
+        <result column="dll_name" jdbcType="VARCHAR" property="dllName"/>
+        <result column="up_dateTime" jdbcType="TIMESTAMP" property="upDateTime"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, account_no, trade_account, gddm_sz, gddm_sh, jy_password, tx_password, ip, port,
+        version, yyb_id, exchange_id_sh, exchange_id_sz, o_name, description, dll_name,up_dateTime
+    </sql>
+
+    <select id="selectById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from trade_tdx_connect_info
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from trade_tdx_connect_info
+        ORDER BY account_no
+    </select>
+
+    <insert id="insert" parameterType="com.icaopan.customer.model.TdxConnectInfo">
+        insert into trade_tdx_connect_info (account_no, trade_account,
+        gddm_sz, gddm_sh, jy_password,
+        tx_password, ip, port,
+        version, yyb_id, exchange_id_sh,
+        exchange_id_sz, o_name, description,
+        dll_name, up_dateTime)
+        values ( #{accountNo,jdbcType=VARCHAR}, #{tradeAccount,jdbcType=VARCHAR},
+        #{gddmSz,jdbcType=VARCHAR}, #{gddmSh,jdbcType=VARCHAR}, #{jyPassword,jdbcType=VARCHAR},
+        #{txPassword,jdbcType=VARCHAR}, #{ip,jdbcType=VARCHAR}, #{port,jdbcType=VARCHAR},
+        #{version,jdbcType=VARCHAR}, #{yybId,jdbcType=VARCHAR}, #{exchangeIdSh,jdbcType=VARCHAR},
+        #{exchangeIdSz,jdbcType=VARCHAR}, #{oName,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR},
+        #{dllName,jdbcType=VARCHAR}, #{upDateTime,jdbcType=VARCHAR})
+    </insert>
+
+    <update id="updateBySelectiveId" parameterType="com.icaopan.customer.model.TdxConnectInfo">
+        update trade_tdx_connect_info
+        <set>
+            <if test="accountNo != null">
+                account_no = #{accountNo,jdbcType=VARCHAR},
+            </if>
+            <if test="tradeAccount != null">
+                trade_account = #{tradeAccount,jdbcType=VARCHAR},
+            </if>
+            <if test="gddmSz != null">
+                gddm_sz = #{gddmSz,jdbcType=VARCHAR},
+            </if>
+            <if test="gddmSh != null">
+                gddm_sh = #{gddmSh,jdbcType=VARCHAR},
+            </if>
+            <if test="jyPassword != null">
+                jy_password = #{jyPassword,jdbcType=VARCHAR},
+            </if>
+            <if test="txPassword != null">
+                tx_password = #{txPassword,jdbcType=VARCHAR},
+            </if>
+            <if test="ip != null">
+                ip = #{ip,jdbcType=VARCHAR},
+            </if>
+            <if test="port != null">
+                port = #{port,jdbcType=VARCHAR},
+            </if>
+            <if test="version != null">
+                version = #{version,jdbcType=VARCHAR},
+            </if>
+            <if test="yybId != null">
+                yyb_id = #{yybId,jdbcType=VARCHAR},
+            </if>
+            <if test="exchangeIdSh != null">
+                exchange_id_sh = #{exchangeIdSh,jdbcType=VARCHAR},
+            </if>
+            <if test="exchangeIdSz != null">
+                exchange_id_sz = #{exchangeIdSz,jdbcType=VARCHAR},
+            </if>
+            <if test="oName != null">
+                o_name = #{oName,jdbcType=VARCHAR},
+            </if>
+            <if test="description != null">
+                description = #{description,jdbcType=VARCHAR},
+            </if>
+            <if test="dllName != null">
+                dll_name = #{dllName,jdbcType=VARCHAR},
+            </if>
+            <if test="dllName != null">
+                up_dateTime = #{upDateTime}
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+</mapper>

@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.icaopan.user.dao.UserSecurityPositionMapper">
+    <resultMap id="BaseResultMap" type="com.icaopan.user.model.UserSecurityPosition">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="internal_security_id" jdbcType="VARCHAR" property="internalSecurityId"/>
+        <result column="available" jdbcType="DECIMAL" property="available"/>
+        <result column="amount" jdbcType="DECIMAL" property="amount"/>
+        <result column="customer_id" jdbcType="INTEGER" property="customerId"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="cost_price" jdbcType="DECIMAL" property="costPrice"/>
+        <result column="user_id" jdbcType="INTEGER" property="userId"/>
+        <result column="total_cost" jdbcType="DECIMAL" property="totalCost"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        a.id, a.internal_security_id, a.available, a.amount,a.customer_id, a.update_time,
+        a.cost_price,a.total_cost,cu.name AS "customerName",u.user_name AS "userName",
+        a.user_id
+    </sql>
+
+    <sql id="userJoins">
+        LEFT JOIN customer cu on a.customer_id = cu.id
+        LEFT JOIN user u on a.user_id = u.id
+    </sql>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from user_security_position a
+        <include refid="userJoins"/>
+        where a.id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <select id="findByUserIdAndInternalSecurityId" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from user_security_position a
+        <include refid="userJoins"/>
+        WHERE 1=1
+        <if test="userId != null">
+            AND a.user_id = #{userId}
+        </if>
+        <if test="internalSecurityId != null">
+            AND a.internal_security_id = #{internalSecurityId}
+        </if>
+    </select>
+
+    <select id="queryPositionByCustomerId" resultMap="BaseResultMap">
+        select
+        a.id, a.internal_security_id, SUM(a.available) AS available, SUM(a.amount) AS amount,a.customer_id,
+        a.cost_price,sum(a.total_cost) as totalcost,cu.name AS "customerName"
+        from user_security_position a
+        <include refid="userJoins"/>
+        WHERE 1 = 1
+        <if test="params.internalSecurityId != null">
+            AND a.internal_security_id = #{params.internalSecurityId}
+        </if>
+        <if test="params.customerId != null">
+            AND a.customer_id = #{params.customerId}
+        </if>
+        GROUP BY a.customer_id,a.internal_security_id
+        ORDER BY a.available,a.customer_id DESC
+    </select>
+
+    <select id="queryByCustomerIdAndInternalSecurityId" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from user_security_position a
+        <include refid="userJoins"/>
+        WHERE 1 = 1
+        <if test="params.customerId != null">
+            AND a.customer_id = #{params.customerId}
+        </if>
+        <if test="params.internalSecurityId != null">
+            AND a.internal_security_id = #{params.internalSecurityId}
+        </if>
+        <if test="params.userName != null and params.userName!=''">
+            AND u.user_name LIKE '%${params.userName}%'
+        </if>
+        ORDER BY a.id
+    </select>
+
+
+    <select id="findByPage" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from user_security_position a
+        <include refid="userJoins"/>
+        where 1=1
+        <if test="params.customerId != null">
+            AND a.customer_id = #{params.customerId}
+        </if>
+        <if test="params.internalSecurityId != null">
+            AND a.internal_security_id like '%${params.internalSecurityId}%'
+        </if>
+        <if test="params.userName != null and params.userName!=''">
+            AND user_name LIKE '%${params.userName}%'
+        </if>
+        <if test="params.userId !=null">
+            and a.user_id = #{params.userId}
+        </if>
+    </select>
+
+
+    <select id="findByUserId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        from user_security_position a
+        <include refid="userJoins"/>
+        where 1=1
+        <if test="userId != null">
+            AND a.user_id = #{userId}
+        </if>
+    </select>
+
+    <select id="findPostionAvailable" resultType="java.math.BigDecimal">
+        select available
+        from user_security_position
+        where user_id=#{userId}
+        and internal_security_id=#{internalSecurityId}
+    </select>
+
+
+    <delete id="deleteEmptyPosition">
+        delete from user_security_position where id in
+        (select s.id from (select * from user_security_position where available = 0.00 and amount = 0.00) s);
+    </delete>
+
+    <insert id="insert" parameterType="com.icaopan.user.model.UserSecurityPosition" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into user_security_position (
+        internal_security_id,
+        <if test="available!=null">available,</if>
+        <if test="amount!=null">amount,</if>
+        <if test="costPrice!=null">cost_price,</if>
+        <if test="totalCost!=null">total_cost,</if>
+        <if test="userId!=null">user_id,</if>
+        <if test="customerId!=null">customer_id,</if>
+        update_time
+        )
+        values (
+        #{internalSecurityId,jdbcType=VARCHAR},
+        <if test="available!=null">
+            #{available,jdbcType=DECIMAL},
+        </if>
+        <if test="amount!=null">
+            #{amount,jdbcType=DECIMAL},
+        </if>
+        <if test="costPrice!=null">#{costPrice,jdbcType=DECIMAL},</if>
+        <if test="totalCost!=null">#{totalCost,jdbcType=DECIMAL},</if>
+        <if test="userId!=null">#{userId,jdbcType=INTEGER},</if>
+        <if test="customerId!=null">#{customerId,jdbcType=INTEGER},</if>
+        now())
+    </insert>
+
+    <update id="updateBySave">
+        update user_security_position
+        <set>
+            <if test="available != null">
+                available = #{available},
+            </if>
+            <if test="amount != null">
+                amount = #{amount},
+            </if>
+            <if test="costPrice!=null">
+                cost_price = #{costPrice},
+            </if>
+            <if test="totalCost!=null">
+                total_cost = #{totalCost},
+            </if>
+            update_time = now()
+        </set>
+        where id = #{id}
+    </update>
+
+    <select id="findByUserIdSecurityId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        from user_security_position a
+        <include refid="userJoins"/>
+        where 1=1
+        <if test="userId != null">
+            AND a.user_id = #{userId}
+        </if>
+        <if test="customerId != null">
+            AND a.customer_id = #{customerId}
+        </if>
+        <if test="internalSecurityId != null">
+            AND a.internal_security_id = #{internalSecurityId}
+        </if>
+    </select>
+
+    <update id="updateAvailable" parameterType="com.icaopan.user.bean.UserPositionParams">
+        update user_security_position
+        <set>
+            <if test="userPositionParams.available != null">
+                available = case
+                when available + (#{userPositionParams.available}) >= 0 then
+                available + (#{userPositionParams.available})
+                END,
+            </if>
+        </set>
+        where user_id = #{userPositionParams.userId}
+        AND internal_security_id = #{userPositionParams.internalSecurityId}
+    </update>
+
+    <update id="updateCostPriceDelta" parameterType="com.icaopan.user.bean.UserPositionParams">
+        update user_security_position
+        set cost_price =  case when amount>0 then
+        (cost_price * amount + #{userPositionParams.costPrice} * #{userPositionParams.amount})/amount
+        else 0
+        end
+        ,total_cost =  total_cost + #{userPositionParams.costPrice} * #{userPositionParams.amount}
+        where user_id = #{userPositionParams.userId}
+        AND internal_security_id = #{userPositionParams.internalSecurityId}
+    </update>
+
+
+    <update id="updateAmountAndCostPrice" parameterType="com.icaopan.user.bean.UserPositionParams">
+        update user_security_position
+        <set>
+            <if test="userPositionParams.costPrice != null and userPositionParams.amount != null">
+                cost_price = case
+                when amount + (#{userPositionParams.amount}) > 0 then
+                (cost_price * amount + #{userPositionParams.costPrice} * #{userPositionParams.amount})/(amount +
+                (#{userPositionParams.amount}))
+                else 0
+                END,
+            </if>
+            <if test="userPositionParams.amount != null">
+                amount = CASE
+                when amount + (#{userPositionParams.amount}) > 0 then
+                amount + (#{userPositionParams.amount})
+                else 0
+                END,
+            </if>
+            <if test="userPositionParams.costPrice !=null and userPositionParams.amount  == null">
+                cost_price = #{userPositionParams.costPrice},
+            </if>
+            <if test="userPositionParams.costPrice != null and userPositionParams.amount != null">
+                total_cost = total_cost + #{userPositionParams.costPrice} * #{userPositionParams.amount},
+            </if>
+            <if test="userPositionParams.amount != null and userPositionParams.costPrice == null">
+                total_cost = total_cost + cost_price * #{userPositionParams.amount},
+            </if>
+            <if test="userPositionParams.costPrice !=null and userPositionParams.amount  == null">
+                total_cost = #{userPositionParams.costPrice}*amount,
+            </if>
+        </set>
+        where user_id = #{userPositionParams.userId}
+        AND internal_security_id = #{userPositionParams.internalSecurityId}
+    </update>
+
+    <update id="adjustPosition">
+        update user_security_position SET
+        available = amount
+        -- WHERE DATE_FORMAT(update_time,'%Y-%m-%d') = DATE_FORMAT(NOW(),'%Y-%m-%d')
+    </update>
+
+    <select id="queryPositionByUserIdStockCode" resultMap="BaseResultMap">
+        SELECT
+        usp.internal_security_id, usp.amount
+        from user_security_position usp, stock_security ss
+        where usp.internal_security_id = ss.internal_security_id
+        <if test="userId != null">
+            AND usp.user_id = #{userId}
+        </if>
+        <if test="stockCode != null">
+            AND ss.code = #{stockCode}
+        </if>
+    </select>
+
+    <select id="queryPositionByUserIdStockType" resultMap="BaseResultMap">
+        SELECT
+        usp.internal_security_id, usp.amount
+        from user_security_position usp, stock_pool sp
+        where usp.internal_security_id = sp.stock_code
+        <if test="userId != null">
+            AND usp.user_id = #{userId}
+        </if>
+        <if test="stockType != null">
+            AND sp.type = #{stockType}
+        </if>
+    </select>
+</mapper>

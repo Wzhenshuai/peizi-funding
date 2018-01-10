@@ -1,0 +1,446 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.icaopan.user.dao.UserMapper">
+  <resultMap id="BaseResultMap" type="com.icaopan.user.model.User">
+    <id column="id" jdbcType="INTEGER" property="id"/>
+    <result column="user_name" jdbcType="VARCHAR" property="userName"/>
+    <result column="real_name" jdbcType="VARCHAR" property="realName"/>
+    <result column="password" jdbcType="VARCHAR" property="password"/>
+    <result column="warn_line" jdbcType="DECIMAL" property="warnLine"/>
+    <result column="open_line" jdbcType="DECIMAL" property="openLine"/>
+    <result column="single_stock_scale" javaType="DECIMAL" property="singleStockScale"/>
+    <result column="small_stock_scale" javaType="DECIMAL" property="smallStockScale"/>
+    <result column="create_stock_scale" javaType="DECIMAL" property="createStockScale"/>
+    <result column="small_single_stock_scale" javaType="DECIMAL" property="smallSingleStockScale"/>
+    <result column="create_single_stock_scale" javaType="DECIMAL" property="createSingleStockScale"/>
+    <result column="user_class_type" jdbcType="VARCHAR" property="userClassTypeVal"/>
+    <result column="status" jdbcType="VARCHAR" property="status"/>
+    <result column="login_count" jdbcType="INTEGER" property="loginCount"/>
+    <result column="related_uuid" jdbcType="VARCHAR" property="relatedUuid"/>
+    <result column="is_default_fee" jdbcType="CHAR" property="isDefaultFee"/>
+    <result column="channel_id" jdbcType="INTEGER" property="channelId"/>
+    <result column="customer_id" jdbcType="INTEGER" property="customerId"/>
+    <result column="ratio_fee" jdbcType="DECIMAL" property="ratioFee"/>
+    <result column="min_cost" jdbcType="DECIMAL" property="minCost"/>
+    <result column="amount" jdbcType="DECIMAL" property="amount"/>
+    <result column="available" jdbcType="DECIMAL" property="available"/>
+    <result column="frozen" jdbcType="DECIMAL" property="frozen"/>
+    <result column="risk_flag" jdbcType="INTEGER" property="riskFlag"/>
+    <result column="risk_amount_quota" jdbcType="DECIMAL" property="riskAmountQuota"/>
+    <result column="risk_quantity_quota" jdbcType="DECIMAL" property="riskQuantityQuota"/>
+    <result column="risk_up_amplitude" jdbcType="DECIMAL" property="riskUpAmplitude"/>
+    <result column="risk_down_amplitude" jdbcType="DECIMAL" property="riskDownAmplitude"/>
+    <result column="cash_amount" jdbcType="DECIMAL" property="cashAmount"/>
+    <result column="finance_amount" jdbcType="DECIMAL" property="financeAmount"/>
+    <result column="last_login_time" jdbcType="TIMESTAMP" property="lastLoginTime"/>
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+    <result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime"/>
+    <result column="is_sz_transfer_fee" jdbcType="CHAR" property="isSzTransferFee"/>
+    <result column="user_trade_type" property="userTradeType"
+            typeHandler="com.icaopan.enums.handler.UserTradeTypeHandler"/>
+  </resultMap>
+    <resultMap id="BaseResultTestTraderMap" type="com.icaopan.user.bean.TestTrader">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="user_name" jdbcType="VARCHAR" property="userName"/>
+        <result column="real_name" jdbcType="VARCHAR" property="realName"/>
+        <result column="channel_id" jdbcType="INTEGER" property="channelId"/>
+        <result column="channel_name" jdbcType="VARCHAR" property="channelName"/>
+    </resultMap>
+  <sql id="Base_Column_List">
+    a.id, a.user_name, a.real_name, a.warn_line, a.open_line, a.status, a.login_count, a.related_uuid,single_stock_scale,small_stock_scale,create_stock_scale,
+    small_single_stock_scale,create_single_stock_scale,a.password,
+    a.is_default_fee, tc.name as 'channel.name',tc.id as 'channel.id', a.customer_id AS "customer.id",cu.name AS "customer.name", a.ratio_fee, a.min_cost, a.amount, a.available,a.frozen,
+    a.cash_amount, a.finance_amount, a.last_login_time, a.create_time, a.modify_time, cu.is_sz_transfer_fee AS "isSzTransferFee",a.user_trade_type,a.user_class_type AS "userClassTypeVal",
+    a.risk_flag,a.risk_amount_quota,a.risk_quantity_quota,a.risk_up_amplitude,a.risk_down_amplitude
+  </sql>
+  <sql id="Base_Column_List_findByUserId">
+    a.id, a.user_name,a.password, a.real_name, a.warn_line, a.open_line, a.status, a.login_count, a.related_uuid,single_stock_scale,small_stock_scale,create_stock_scale,
+    small_single_stock_scale,create_single_stock_scale,
+    a.is_default_fee, tc.name as 'channel.name',tc.id as 'channel.id', a.customer_id AS "customer.id",cu.name AS "customer.name", a.ratio_fee, a.min_cost, a.amount, a.available,a.frozen,
+    a.cash_amount, a.finance_amount, a.last_login_time, a.create_time, a.modify_time, cu.is_sz_transfer_fee AS "isSzTransferFee",a.user_trade_type,a.user_class_type AS "userClassTypeVal",
+    a.risk_flag,a.risk_amount_quota,a.risk_quantity_quota,a.risk_up_amplitude,a.risk_down_amplitude
+  </sql>
+  <sql id="userJoins">
+    LEFT JOIN customer cu on a.customer_id = cu.id
+    LEFT JOIN user_channel ch on a.id = ch.user_id
+    LEFT JOIN trade_channel tc on ch.channel_id = tc.id
+  </sql>
+
+  <select id="verify" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List"/>
+    from user a
+    <include refid="userJoins"/>
+    WHERE user_name = #{userName}
+    group by a.id ORDER BY a.create_time DESC
+  </select>
+
+  <select id="findByUserId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List_findByUserId"/>
+    from user a
+    <include refid="userJoins"/>
+    where a.id = #{userId}
+    group by a.id ORDER BY a.create_time DESC
+  </select>
+
+  <select id="findByCustomerId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List"/>
+    from user a
+    <include refid="userJoins"/>
+    where a.customer_id = #{customerId}
+    group by a.id ORDER BY a.create_time DESC
+  </select>
+
+  <select id="findUser" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List"/>
+    from user a
+    <include refid="userJoins"/>
+    where a.user_name=#{userName}
+    and a.password=#{passWord}
+    limit 1
+  </select>
+
+  <select id="findRelatedUser" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List"/>
+    from user a
+    <include refid="userJoins"/>
+    where a.related_uuid in
+    (select
+    related_uuid
+    from user
+    where id = #{userId}) and a.id != #{userId}
+    group by a.id ORDER BY a.create_time DESC
+  </select>
+
+  <select id="findAllUsersByPage" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM user a
+    <include refid="userJoins"/>
+    WHERE 1=1
+    <if test="params.userName !=null and params.userName !='' ">
+      and a.user_name like '%${params.userName}%'
+    </if>
+    <if test="params.realName != null">
+      and a.real_name = #{params.realName}
+    </if>
+    <if test="params.customerId != null">
+      and a.customer_id = #{params.customerId}
+    </if>
+    <if test="params.channelId != null">
+      and a.id IN (select user_id from user_channel where channel_id = #{params.channelId})
+    </if>
+    <if test="params.status != null">
+      AND a.status = #{params.status}
+    </if>
+    group by a.id ORDER BY create_time DESC
+  </select>
+
+  <insert id="insert" parameterType="com.icaopan.user.model.User" useGeneratedKeys="true" keyProperty="id">
+    insert into user ( user_name, real_name,
+      password, warn_line, open_line,
+      single_stock_scale,
+      small_stock_scale,
+      create_stock_scale,
+      small_single_stock_scale,
+      create_single_stock_scale,
+      status, login_count, related_uuid,
+      is_default_fee, channel_id, customer_id,
+      ratio_fee, min_cost, amount,
+      available, cash_amount, finance_amount,
+      last_login_time, create_time, modify_time,user_trade_type,risk_flag
+      <if test="userClassTypeVal != null">
+        ,user_class_type
+      </if>
+      <if test="riskAmountQuota != null">
+        ,risk_amount_quota
+      </if>
+      <if test="riskQuantityQuota != null">
+        ,risk_quantity_quota
+      </if>
+      <if test="riskUpAmplitude != null">
+        ,risk_up_amplitude
+      </if>
+      <if test="riskDownAmplitude != null">
+        ,risk_down_amplitude
+      </if>
+      )
+    values (#{userName,jdbcType=VARCHAR}, #{realName,jdbcType=VARCHAR},
+      #{password,jdbcType=VARCHAR}, #{warnLine,jdbcType=DECIMAL}, #{openLine,jdbcType=DECIMAL},
+      #{singleStockScale,jdbcType=DECIMAL},
+      #{smallStockScale,jdbcType=DECIMAL},
+      #{createStockScale,jdbcType=DECIMAL},
+      #{smallSingleStockScale,jdbcType=DECIMAL},
+      #{createSingleStockScale,jdbcType=DECIMAL},
+      #{status},0, #{relatedUuid,jdbcType=VARCHAR},
+      #{isDefaultFee,jdbcType=CHAR}, #{channelId,jdbcType=INTEGER}, #{customerId,jdbcType=INTEGER},
+      #{ratioFee,jdbcType=DECIMAL}, #{minCost,jdbcType=DECIMAL}, #{amount,jdbcType=DECIMAL},
+      #{available,jdbcType=DECIMAL}, #{cashAmount,jdbcType=DECIMAL}, #{financeAmount,jdbcType=DECIMAL},
+      NULL , now(), now(),#{userTradeTypeVal,jdbcType=INTEGER},#{riskFlag,jdbcType=INTEGER}
+      <if test="userClassTypeVal != null">
+        ,#{userClassTypeVal,jdbcType=VARCHAR}
+      </if>
+      <if test="riskAmountQuota != null">
+        ,#{riskAmountQuota,jdbcType=DECIMAL}
+      </if>
+      <if test="riskQuantityQuota != null">
+        ,#{riskQuantityQuota,jdbcType=DECIMAL}
+      </if>
+      <if test="riskUpAmplitude != null">
+        ,#{riskUpAmplitude,jdbcType=DECIMAL}
+      </if>
+      <if test="riskDownAmplitude != null">
+        ,#{riskDownAmplitude,jdbcType=DECIMAL}
+      </if>
+      )
+  </insert>
+
+  <update id="unLinkUser">
+    UPDATE user SET related_uuid = NULL
+    WHERE id = #{userId}
+  </update>
+
+  <update id="updateLoginCountAndLastTime">
+  	update user set login_count=login_count+1,last_login_time=now()
+  	where id=#{userId}
+  </update>
+
+  <update id="updateUser" parameterType="com.icaopan.user.model.User">
+    update user
+    <set>
+      <if test="userName != null">
+        user_name = #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="realName != null">
+        real_name = #{realName,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null">
+        password = #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="warnLine != null">
+        warn_line = #{warnLine,jdbcType=DECIMAL},
+      </if>
+      <if test="openLine != null">
+        open_line = #{openLine,jdbcType=DECIMAL},
+      </if>
+      <if test="singleStockScale != null">
+        single_stock_scale = #{singleStockScale,jdbcType=DECIMAL},
+      </if>
+      <if test="smallStockScale != null">
+        small_stock_scale = #{smallStockScale,jdbcType=DECIMAL},
+      </if>
+      <if test="createStockScale != null">
+        create_stock_scale = #{createStockScale,jdbcType=DECIMAL},
+      </if>
+      <if test="smallSingleStockScale != null">
+        small_single_stock_scale = #{smallSingleStockScale,jdbcType=DECIMAL},
+      </if>
+      <if test="createSingleStockScale != null">
+        create_single_stock_scale = #{createSingleStockScale,jdbcType=DECIMAL},
+      </if>
+      <if test="status != null">
+        status = #{status},
+      </if>
+      <if test="relatedUuid != null">
+        related_uuid = #{relatedUuid,jdbcType=VARCHAR},
+      </if>
+      <if test="isDefaultFee != null">
+        is_default_fee = #{isDefaultFee,jdbcType=CHAR},
+      </if>
+      <if test="channelId != null">
+        channel_id = #{channelId,jdbcType=INTEGER},
+      </if>
+      <if test="customerId != null">
+        customer_id = #{customerId,jdbcType=INTEGER},
+      </if>
+      <if test="ratioFee != null">
+        ratio_fee = #{ratioFee,jdbcType=DECIMAL},
+      </if>
+      <if test="minCost != null">
+        min_cost = #{minCost,jdbcType=DECIMAL},
+      </if>
+      <if test="amount != null">
+        amount = #{amount,jdbcType=DECIMAL},
+      </if>
+      <if test="available != null">
+        available = #{available,jdbcType=DECIMAL},
+      </if>
+      <if test="frozen != null">
+        frozen = #{frozen,jdbcType=DECIMAL},
+      </if>
+      <if test="cashAmount != null">
+        cash_amount = #{cashAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="financeAmount != null">
+        finance_amount = #{financeAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="userTradeTypeVal != null">
+        user_trade_type = #{userTradeTypeVal,jdbcType=INTEGER},
+      </if>
+      <if test="userClassTypeVal != null">
+        user_class_type = #{userClassTypeVal,jdbcType=VARCHAR},
+      </if>
+      <if test="riskFlag != null">
+        risk_flag = #{riskFlag,jdbcType=INTEGER},
+      </if>
+      <if test="riskAmountQuota != null">
+        risk_amount_quota = #{riskAmountQuota,jdbcType=DECIMAL},
+      </if>
+      <if test="riskQuantityQuota != null">
+        risk_quantity_quota = #{riskQuantityQuota,jdbcType=DECIMAL},
+      </if>
+      <if test="riskUpAmplitude != null">
+        risk_up_amplitude = #{riskUpAmplitude,jdbcType=DECIMAL},
+      </if>
+      <if test="riskDownAmplitude != null">
+        risk_down_amplitude = #{riskDownAmplitude,jdbcType=DECIMAL},
+      </if>
+      modify_time = now()
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <update id="updateRiskControl">
+    UPDATE user SET
+    warn_line = #{warnLine},
+    open_line = #{openLine},
+    modify_time = now()
+    WHERE id = #{userId}
+  </update>
+
+  <update id="updateUserStatus">
+    UPDATE user SET
+      status = #{userStatus},
+      modify_time = now()
+    WHERE id = #{userId};
+  </update>
+
+  <update id="updateCostFee">
+    UPDATE user
+    <set>
+      <if test="minCost != null">
+        min_cost = #{minCost},
+      </if>
+      <if test="ratioFee != null">
+        ratio_fee = #{ratioFee},
+      </if>
+      modify_time = now()
+    </set>
+    WHERE id = #{userId}
+  </update>
+
+  <update id="updateRatioRiskControl">
+    UPDATE user
+    <set>
+      <if test="singleStockScale != null">
+        single_stock_scale = #{singleStockScale},
+      </if>
+      <if test="smallStockScale != null">
+        small_stock_scale = #{smallStockScale},
+      </if>
+      <if test="createStockScale != null">
+        create_stock_scale = #{createStockScale},
+      </if>
+      <if test="smallSingleStockScale != null">
+        small_single_stock_scale = #{smallSingleStockScale},
+      </if>
+      <if test="createSingleStockScale != null">
+        create_single_stock_scale = #{createSingleStockScale},
+      </if>
+      modify_time = now()
+    </set>
+    WHERE id = #{userId}
+  </update>
+
+  <update id="updateCapitalBySave">
+    UPDATE user
+    <set>
+      <if test="cashAmount != null">
+        cash_amount = #{cashAmount},
+      </if>
+      <if test="financeAmount != null">
+        finance_amount = #{financeAmount},
+      </if>
+      modify_time = now()
+    </set>
+    WHERE id = #{userId}
+  </update>
+
+  <update id="updateCapitalByChanged">
+    UPDATE user
+    <set>
+      <if test="cashChanged != null">
+        cash_amount = cash_amount + #{cashChanged},
+      </if>
+      <if test="financeChanged != null">
+        finance_amount = finance_amount + #{financeChanged},
+      </if>
+      modify_time = now()
+    </set>
+    WHERE id = #{userId}
+  </update>
+
+  <update id="updateAvailableAndTotalAmount">
+    UPDATE user
+    <set>
+      <if test="availableChanged != null">
+        available = available + #{availableChanged},
+      </if>
+      <if test="amountChanged != null">
+        amount = amount + #{amountChanged},
+      </if>
+      modify_time = now()
+    </set>
+    WHERE id = #{userId}
+  </update>
+
+  <update id="updateLoginCount" parameterType="java.lang.Integer">
+    UPDATE user SET
+      login_count = login_count+1 ,
+      last_login_time = now()
+      WHERE id = #{userId};
+  </update>
+
+  <update id="updateRatioFeeToDefault" parameterType="java.lang.Integer">
+    update user set
+    is_default_fee = 1,
+    modify_time = now()
+    where id = #{userId};
+  </update>
+
+  <update id="updatePwd">
+    update user set
+    <if test="pwd != null">
+      password = #{pwd},
+    </if>
+    modify_time = now()
+    where id = #{userId};
+  </update>
+
+  <update id="updateFrozen">
+    UPDATE user SET
+    <if test="frozen != null">
+      available = available - #{frozen},frozen = frozen + #{frozen},
+    </if>
+    modify_time = now()
+    WHERE id = #{id}
+  </update>
+
+  <update id="adjustPosition">
+    UPDATE user SET available = amount - frozen
+  </update>
+  <select id="queryTestTrader" resultMap="BaseResultTestTraderMap">
+    select
+    a.id, a.user_name, a.real_name, a.status,
+    tc.name as 'channelName',tc.id as 'channelId'
+    from user a
+    LEFT JOIN user_channel ch on a.id = ch.user_id
+    LEFT JOIN trade_channel tc on ch.channel_id = tc.id
+    where a.real_name = 'test-trader'
+    ORDER BY a.id DESC
+  </select>
+</mapper>

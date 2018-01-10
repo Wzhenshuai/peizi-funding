@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.icaopan.user.dao.UserChannelMapper">
+    <resultMap id="BaseResultMap" type="com.icaopan.user.model.UserChannel">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="channel_id" jdbcType="INTEGER" property="channelId"/>
+        <result column="user_id" jdbcType="INTEGER" property="userId"/>
+        <result column="priority_level" jdbcType="INTEGER" property="priorityLevel"/>
+        <result column="available" jdbcType="DECIMAL" property="available"/>
+        <result column="quota" jdbcType="DECIMAL" property="quota"/>
+        <result column="proportion" jdbcType="INTEGER" property="proportion"/>
+        <result column="user_channel_type" jdbcType="INTEGER" property="userChannelTypeVal"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,
+        channel_id,
+        user_id,
+        priority_level,
+        quota,
+        proportion,
+        user_channel_type
+    </sql>
+
+    <select id="findByUserId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from
+          user_channel
+        WHERE user_id = #{userId}
+    </select>
+
+    <select id="selectByUserIdAndChannelId" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from
+        user_channel
+        WHERE user_id = #{userId} AND channel_id = #{channelId}
+    </select>
+
+    <insert id="insert" parameterType="java.util.List">
+        INSERT INTO user_channel (
+        channel_id,
+        user_id,
+        priority_level,
+        quota,
+        proportion,
+        user_channel_type
+        )
+        values
+        <foreach collection="userChannelList" item="userChannel" index="index" open="(" separator="),(" close=")">
+            #{userChannel.channelId, jdbcType=INTEGER},
+            #{userChannel.userId, jdbcType=INTEGER},
+            #{userChannel.priorityLevel, jdbcType=INTEGER},
+            #{userChannel.quota, jdbcType=DECIMAL},
+            #{userChannel.proportion, jdbcType=INTEGER},
+            #{userChannel.userChannelTypeVal, jdbcType=INTEGER}
+        </foreach>
+    </insert>
+
+    <update id="update" parameterType="java.util.List">
+
+        <foreach collection="userChannelList" item="userChannel" index="index" separator=",">
+            update user_channel
+            <set>
+                <if test="channelId != null">
+                    channel_id = #{userChannel.channelId,jdbcType=INTEGER},
+                </if>
+                <if test="priorityLevel != null">
+                    priority_level = #{userChannel.priorityLevel,jdbcType=INTEGER},
+                </if>
+                <if test="quato != null">
+                    quato = #{userChannel.quota,jdbcType=DECIMAL},
+                </if>
+                <if test="proportion != null">
+                    proportion = #{userChannel.proportion,jdbcType=INTEGER},
+                </if>
+                <if test="userChannelTypeVal != null">
+                    user_channel_type = #{userChannel.userChannelTypeVal,jdbcType=INTEGER}
+                </if>
+
+            </set>
+            WHERE user_id = #{userChannel.userId,jdbcType=INTEGER}
+        </foreach>
+
+    </update>
+
+    <delete id="deleteByUserId" parameterType="java.lang.Integer">
+        DELETE FROM user_channel
+        WHERE user_id = #{userId}
+    </delete>
+
+    <delete id="deleteByUserIdAndChannelId">
+        DELETE FROM user_channel
+        WHERE user_id = #{userId} AND channel_id = #{channelId}
+    </delete>
+
+
+    <update id="addUserChannelQuota">
+        UPDATE user_channel SET quota = case
+               	when quota + (#{variable}) >= 0 then
+                quota + (#{variable})
+                else
+                0
+                END
+        WHERE user_id = #{userId} and channel_id = #{channelId}
+        and user_channel_type = #{userChannelType}
+    </update>
+
+    <update id="updateUserChannelQuota">
+        UPDATE user_channel SET quota = case
+               	when quota + (#{variable}) >= 0 then
+                quota + (#{variable})
+                else
+                0
+                END
+        WHERE user_id = #{userId} and channel_id = #{channelId}
+        and user_channel_type = #{userChannelType}
+    </update>
+
+</mapper>

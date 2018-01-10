@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.icaopan.trade.dao.FillHistoryMapper">
+    <resultMap id="BaseResultMap" type="com.icaopan.trade.model.FillHistory">
+        <id column="id" jdbcType="VARCHAR" property="id"/>
+        <result column="security_code" jdbcType="VARCHAR" property="securityCode"/>
+        <result column="security_name" jdbcType="VARCHAR" property="securityName"/>
+        <result column="quantity" jdbcType="INTEGER" property="quantity"/>
+        <result column="price" jdbcType="DECIMAL" property="price"/>
+        <result column="amount" jdbcType="DECIMAL" property="amount"/>
+        <result column="side" jdbcType="VARCHAR" property="side"/>
+        <result column="user_name" jdbcType="VARCHAR" property="userName"/>
+        <result column="name" jdbcType="VARCHAR" property="channelName"/>
+        <result column="name" jdbcType="VARCHAR" property="customerName"/>
+        <result column="fill_time" jdbcType="VARCHAR" property="fillTime"/>
+        <result column="account" jdbcType="VARCHAR" property="account"/>
+        <result column="placement_code" jdbcType="VARCHAR" property="placementCode"/>
+        <result column="fill_code" jdbcType="VARCHAR" property="fillCode"/>
+        <result column="user_id" jdbcType="INTEGER" property="userId"/>
+        <result column="channel_placement_id" jdbcType="INTEGER" property="channelPlacementId"/>
+        <result column="customer_id" jdbcType="INTEGER" property="customerId"/>
+        <result column="channel_id" jdbcType="INTEGER" property="channelId"/>
+        <result column="fill_id" jdbcType="INTEGER" property="fillId"/>
+        <result column="placement_id" jdbcType="INTEGER" property="placementId"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, security_code, quantity, price, amount, side, fill_time, account,
+        placement_code, fill_code, user_id, channel_placement_id, customer_id, channel_id,
+        fill_id, placement_id
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from trade_fill_history tfh
+        where id = #{id,jdbcType=VARCHAR}
+    </select>
+    <select id="selectByPage" resultMap="BaseResultMap">
+        select
+        tfh.id,
+        security_code,
+        quantity,
+        price,
+        tfh.amount,
+        side,
+        fill_time,
+        account,
+        placement_code,
+        fill_code,
+        user_id,
+        channel_placement_id,
+        tfh.customer_id,
+        tfh.channel_id,
+        fill_id,
+        placement_id,
+        u.user_name userName,
+        tc. NAME channelName,
+        c.name customerName,
+        sc.name security_name
+        FROM
+        trade_fill_history tfh
+        LEFT JOIN `user` u ON tfh.user_id = u.id
+        LEFT JOIN trade_channel tc ON tc.id = tfh.channel_id
+        LEFT JOIN customer c ON c.id = tfh.customer_id
+        LEFT JOIN stock_security sc on sc.code=tfh.security_code
+        where 1 = 1
+        <if test="params.securityCode != null and params.securityCode != '' ">
+            and tfh.security_code = #{params.securityCode}
+        </if>
+        <if test="params.userId != null and params.userId != '' ">
+            and u.id = #{params.userId}
+        </if>
+        <if test="params.userName != null and params.userName != '' ">
+            and u.user_name = #{params.userName}
+        </if>
+        <if test="params.side != null and params.side != '' ">
+            and tfh.side = #{params.side}
+        </if>
+        <if test="params.customerId != null and params.customerId != '' ">
+            and tfh.customer_id = #{params.customerId}
+        </if>
+        <if test="params.channelId != null and params.channelId != '' ">
+            and tfh.channel_id = #{params.channelId}
+        </if>
+        <if test="params.startTime != null and params.startTime != '' ">
+            <![CDATA[
+    		and	date(tfh.fill_time) >= date(#{params.startTime})
+    	]]>
+        </if>
+        <if test="params.endTime != null and params.endTime != '' ">
+            <![CDATA[
+           and  date(tfh.fill_time) <= date(#{params.endTime})
+         ]]>
+        </if>
+        ORDER BY fill_time DESC
+    </select>
+
+    <insert id="insert" parameterType="com.icaopan.trade.model.FillHistory">
+        insert into trade_fill_history ( security_code, quantity,
+        price, amount, side, fill_time,
+        account, placement_code, fill_code,
+        user_id, channel_placement_id, customer_id,
+        channel_id, fill_id, placement_id)
+        values ( #{securityCode,jdbcType=VARCHAR}, #{quantity,jdbcType=INTEGER},
+        #{price,jdbcType=DECIMAL}, #{amount,jdbcType=DECIMAL}, #{side,jdbcType=VARCHAR}, #{fillTime,jdbcType=VARCHAR},
+        #{account,jdbcType=VARCHAR}, #{placementCode,jdbcType=VARCHAR}, #{fillCode,jdbcType=VARCHAR},
+        #{userId,jdbcType=INTEGER}, #{channelPlacementId,jdbcType=INTEGER}, #{customerId,jdbcType=INTEGER},
+        #{channelId,jdbcType=INTEGER}, #{fillId,jdbcType=INTEGER}, #{placementId,jdbcType=INTEGER})
+    </insert>
+
+    <insert id="generateHistory">
+        INSERT INTO trade_fill_history(
+        fill_id,security_code,quantity,
+        side,price,amount,
+        fill_time,account,placement_code,
+        fill_code,user_id,channel_placement_id,
+        channel_id,customer_id,placement_id)
+        SELECT
+        id,security_code, quantity,
+        side, price, amount,
+        fill_time,account, placement_code,
+        fill_code,user_id, channel_placement_id,
+        channel_id,customer_id, placement_id
+        FROM trade_fill
+    </insert>
+
+</mapper>

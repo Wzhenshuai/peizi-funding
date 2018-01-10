@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.icaopan.trade.dao.BrokerPositionMapper" >
+  <resultMap id="BaseResultMap" type="com.icaopan.trade.model.BrokerPosition" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="account" property="account" jdbcType="VARCHAR" />
+    <result column="stock_code" property="stockCode" jdbcType="VARCHAR" />
+    <result column="stock_name" property="stockName" jdbcType="VARCHAR" />
+    <result column="amount" property="amount" jdbcType="DOUBLE" />
+    <result column="cost_price" property="costPrice" jdbcType="DOUBLE" />
+    <result column="create_date" property="createDate" jdbcType="DATE" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, account, stock_code, amount,cost_price, create_date
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from broker_position
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <select id="selectByCondition" resultMap="BaseResultMap" parameterType="com.icaopan.trade.bean.BrokerPositionQueryParams">
+  	select 
+    bp.*,sc.name stock_name
+    from broker_position bp left join trade_channel tc on bp.account=tc.code
+    left join stock_security sc on sc.code=bp.stock_code
+    where 1=1
+    <if test="account!=null and account!=''">
+    	and bp.account=#{account}
+    </if>
+    <if test="stockCode!=null and stockCode!=''">
+    	and bp.stock_code=#{stockCode}
+    </if>
+    <if test="createDate!=null and createDate!=''">
+    	and DATE_FORMAT(create_date,'Y-%m-%d')=DATE_FORMAT(#{createDate},'Y-%m-%d')
+    </if>
+    <if test="customerId!=null">
+    	and tc.customer_id=#{customerId}
+    </if>
+  </select>
+
+  <insert id="insert" parameterType="com.icaopan.trade.model.BrokerPosition" >
+    insert into broker_position ( account, stock_code, 
+      amount,cost_price, create_date)
+    values ( #{account,jdbcType=VARCHAR}, #{stockCode,jdbcType=VARCHAR}, 
+      #{amount,jdbcType=DOUBLE},#{costPrice,jdbcType=DOUBLE}, #{createDate,jdbcType=DATE})
+  </insert>
+</mapper>

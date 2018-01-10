@@ -1,0 +1,7 @@
+|connect|
+|query|select * from stock_pool|
+|stock_code|stock_name|type|customer_id|
+|062000|iopqw|1|2|
+|061300|ttpsa|2|1|
+
+

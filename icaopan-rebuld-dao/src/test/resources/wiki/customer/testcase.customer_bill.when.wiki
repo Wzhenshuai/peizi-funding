@@ -1,0 +1,8 @@
+|connect|
+|clean table|customer_bill|
+
+|insert|customer_bill|
+|channel_id|operation_type|balance|fill_amount|fee|operation_user|customer_id|
+|20001|DEDUCTIONBYMONTH|99740.00|3000|-300.000|张三|101|
+
+|commit|

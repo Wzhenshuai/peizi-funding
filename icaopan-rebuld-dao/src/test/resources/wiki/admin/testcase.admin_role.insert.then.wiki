@@ -1,0 +1,7 @@
+|connect|
+
+|query|select * from admin_role|
+|rolename|roledesc|
+|管理员|管理员|
+|zhangsan|zhangsan|
+

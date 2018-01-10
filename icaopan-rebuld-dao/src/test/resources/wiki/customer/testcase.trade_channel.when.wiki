@@ -1,0 +1,8 @@
+|connect|
+|clean table|trade_channel|
+
+|insert|trade_channel|
+|id|code|name|tatio|min_cost|is_available|notes|channel_type|customer_id|
+|1001|10080|张三|0.003|100000|1|通道管理|PB|2002|
+
+|commit|

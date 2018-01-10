@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.icaopan.trade.dao.ComplianceResultMapper" >
+  <resultMap id="BaseResultMap" type="com.icaopan.trade.model.ComplianceResult" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="user_name" property="userName" jdbcType="VARCHAR" />
+    <result column="op_type" property="opType" jdbcType="VARCHAR" />
+    <result column="stock_code" property="stockCode" jdbcType="VARCHAR" />
+    <result column="stock_name" property="stockName" jdbcType="VARCHAR" />
+    <result column="quantity" property="quantity" jdbcType="VARCHAR" />
+    <result column="reason" property="reason" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, user_name, op_type, stock_code,quantity, reason, create_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from trade_compliance_result
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <select id="selectByPage" resultMap="BaseResultMap">
+  	select c.name AS "customerName",r.*,sc.name stock_name
+    from trade_compliance_result r
+    left join user u on r.user_name=u.user_name
+    LEFT JOIN customer c ON c.id = u.customer_id
+    left join stock_security sc on sc.code=r.stock_code
+    where 1=1
+    <if test="params.customerId != null">
+        and u.customer_id = #{params.customerId}
+    </if>
+    <if test="params.userName != null and params.userName != '' ">
+      and r.user_name = #{params.userName}
+    </if>
+    <if test="params.stockCode!=null and params.stockCode!='' ">
+    	and r.stock_code=#{params.stockCode}
+    </if>
+    <if test="params.startTime != null and params.startTime != ''">
+      <![CDATA[
+    		and	date(r.create_time) >= date(#{params.startTime})
+    	]]>
+    </if>
+    <if test="params.endTime != null and params.endTime != '' ">
+      <![CDATA[
+           and  date(r.create_time) <= date(#{params.endTime})
+         ]]>
+    </if>
+    order by create_time desc
+  </select>	
+	
+  <insert id="insert" parameterType="com.icaopan.trade.model.ComplianceResult" >
+    insert into trade_compliance_result (id, user_name, op_type, 
+      stock_code,quantity, reason,create_time
+      )
+    values (#{id,jdbcType=INTEGER}, #{userName,jdbcType=VARCHAR}, #{opType,jdbcType=VARCHAR}, 
+      #{stockCode,jdbcType=VARCHAR}, #{quantity,jdbcType=VARCHAR} ,#{reason,jdbcType=VARCHAR}, now()
+      )
+  </insert>
+  
+  
+</mapper>

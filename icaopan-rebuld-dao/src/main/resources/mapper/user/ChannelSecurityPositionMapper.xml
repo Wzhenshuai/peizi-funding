@@ -1,0 +1,398 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.icaopan.user.dao.ChannelSecurityPositionMapper">
+    <resultMap id="BaseResultMap" type="com.icaopan.user.model.ChannelSecurityPosition">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="internal_security_id" jdbcType="VARCHAR" property="internalSecurityId"/>
+        <result column="available" jdbcType="DECIMAL" property="available"/>
+        <result column="amount" jdbcType="DECIMAL" property="amount"/>
+        <result column="customer_id" jdbcType="INTEGER" property="customerId"/>
+        <result column="channel_id" jdbcType="INTEGER" property="channelId"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="cost_price" jdbcType="DECIMAL" property="costPrice"/>
+        <result column="user_id" jdbcType="INTEGER" property="userId"/>
+        <result column="total_cost" jdbcType="DECIMAL" property="totalCost"/>
+    </resultMap>
+
+    <resultMap id="UserChannelPositionMap" type="com.icaopan.user.model.UserChannelPosition">
+        <result column="amount" jdbcType="DECIMAL" property="amount"/>
+        <result column="channel_id" jdbcType="INTEGER" property="channelId"/>
+        <result column="channel_name" jdbcType="VARCHAR" property="channelName"/>
+        <result column="user_name" jdbcType="VARCHAR" property="userName"/>
+        <result column="internal_security_id" jdbcType="VARCHAR" property="internalSecurityId"/>
+    </resultMap>
+    
+    <resultMap id="BaseResultMap2" type="com.icaopan.user.model.ChannelSecurityPosition">
+    	<id column="id" jdbcType="INTEGER" property="id"/>
+    	<result column="cost_price" jdbcType="DECIMAL" property="costPrice"/>
+        <result column="total_cost" jdbcType="DECIMAL" property="totalCost"/>
+        <result column="amount" jdbcType="DECIMAL" property="amount"/>
+        <result column="channel_id" jdbcType="INTEGER" property="channelId"/>
+        <result column="channel_name" jdbcType="VARCHAR" property="channelName"/>
+        <result column="user_name" jdbcType="VARCHAR" property="userName"/>
+        <result column="internal_security_id" jdbcType="VARCHAR" property="internalSecurityId"/>
+        <result column="stock_name" jdbcType="VARCHAR" property="stockName"/>
+    </resultMap>
+
+	
+    <sql id="Base_Column_List">
+        a.id, a.internal_security_id, a.available, a.amount,a.customer_id, a.channel_id, a.update_time,
+        a.cost_price,cu.name AS "customerName",cu.notes as "customerNotes",u.user_name AS "userName",ch.name AS
+        "channelName",ch.code AS
+        "channelCode",a.total_cost,
+        a.user_id
+    </sql>
+
+    <sql id="userJoins">
+        LEFT JOIN customer cu on a.customer_id = cu.id
+        LEFT JOIN user u on a.user_id = u.id
+        LEFT JOIN trade_channel ch ON a.channel_id = ch.id
+    </sql>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from channel_security_position a
+        <include refid="userJoins"/>
+        where a.id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <select id="findByUserIdAndInternalSecurityId" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from channel_security_position a
+        <include refid="userJoins"/>
+        WHERE 1=1
+        <if test="userId != null">
+            AND a.user_id = #{userId}
+        </if>
+        <if test="internalSecurityId != null">
+            AND a.internal_security_id = #{internalSecurityId}
+        </if>
+    </select>
+
+    <select id="findByPage" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from channel_security_position a
+        <include refid="userJoins"/>
+        where 1=1
+        <if test="params.customerId != null">
+            AND a.customer_id = #{params.customerId}
+        </if>
+        <if test="params.channelId != null">
+            AND a.channel_id = #{params.channelId}
+        </if>
+        <if test="params.internalSecurityId != null">
+            AND a.internal_security_id LIKE '%${params.internalSecurityId}%'
+        </if>
+        <if test="params.userName != null">
+            AND a.user_id IN (SELECT id FROM user WHERE user_name LIKE '%${params.userName}%')
+        </if>
+        <if test="params.userId != null">
+            AND a.user_id = #{params.userId}
+        </if>
+    </select>
+
+    <select id="find" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from channel_security_position a
+        <include refid="userJoins"/>
+        where 1=1
+        <if test="userName != null">
+            AND a.user_id IN
+            ( SELECT id FROM user where user_name LIKE '%${userName}%')
+        </if>
+        <if test="customerId != null">
+            AND a.customer_id = #{customerId}
+        </if>
+        <if test="internalSecurityId != null">
+            AND a.internal_security_id = #{internalSecurityId}
+        </if>
+        <if test="channelId != null">
+            AND a.channel_id = #{channelId}
+        </if>
+    </select>
+
+    <select id="findAllPostionBySecurityId" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from channel_security_position a
+        <include refid="userJoins"/>
+        where a.internal_security_id=#{securityId}
+        and a.amount>0
+    </select>
+
+    <select id="findByUserIdAndChannelIdAndInternalSecurityId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        from channel_security_position a
+        <include refid="userJoins"/>
+        where 1=1
+        <if test="userId != null">
+            AND a.user_id = #{userId}
+        </if>
+        <if test="channelId != null">
+            AND a.channel_id = #{channelId}
+        </if>
+        <if test="internalSecurityId != null">
+            AND a.internal_security_id = #{internalSecurityId}
+        </if>
+    </select>
+
+    <select id="findByCustomerIdAndInternalSecurityId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        from channel_security_position a
+        <include refid="userJoins"/>
+        where 1=1
+        <if test="params.customerId != null">
+            AND a.customer_id = #{params.customerId}
+        </if>
+        <if test="params.internalSecurityId != null">
+            AND a.internal_security_id = #{params.internalSecurityId}
+        </if>
+        <if test="params.channelId != null and params.channelId != ''">
+            AND a.channel_id = #{params.channelId}
+        </if>
+        ORDER BY a.id
+    </select>
+
+    <select id="findByUserId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        from channel_security_position a
+        <include refid="userJoins"/>
+        where 1=1
+        <if test="userId != null">
+            AND a.user_id = #{userId}
+        </if>
+    </select>
+
+    <select id="findPostionAvailable" resultType="java.math.BigDecimal">
+        select sum(available)
+        from channel_security_position
+        where user_id=#{userId}
+        and internal_security_id=#{internalSecurityId}
+    </select>
+
+	<select id="querySummarySecurityPostionAmount" resultType="DOUBLE">
+		select sum(p.amount)
+		from channel_security_position p  left join trade_channel c
+		on p.channel_id=c.id
+		where c.code=#{account}
+		and p.internal_security_id=#{securityId}
+	</select>
+	
+	<select id="queryAllByAccount" resultMap="BaseResultMap2">
+        select p.id,p.amount,p.channel_id,c.name as
+        channel_name,u.user_name,p.internal_security_id,p.cost_price,p.total_cost,sc.name as stock_name
+		from channel_security_position p  left join trade_channel c on p.channel_id=c.id left join user u on p.user_id=u.id
+		left join stock_security sc on sc.internal_security_id=p.internal_security_id
+		where c.code=#{account}
+		and p.internal_security_id=#{securityId} 
+	</select>
+
+	<select id="queryAllStockCode" resultType="STRING">
+		select internal_security_id
+		from channel_security_position
+		group by internal_security_id
+	</select>
+
+    <delete id="deleteEmptyPosition">
+      delete from channel_security_position WHERE  id in
+        (SELECT s.id FROM (
+        select * from channel_security_position
+        where available = 0.00
+        and amount = 0.00)s
+        );
+    </delete>
+
+    <insert id="insert" parameterType="com.icaopan.user.model.ChannelSecurityPosition" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into channel_security_position (
+        internal_security_id,
+        <if test="available!=null">available,</if>
+        <if test="amount!=null">amount,</if>
+        <if test="channelId!=null">channel_id,</if>
+        <if test="costPrice!=null">cost_price,</if>
+        <if test="totalCost!=null">total_cost,</if>
+        <if test="userId!=null">user_id,</if>
+        <if test="customerId!=null">customer_id,</if>
+        update_time)
+        values (#{internalSecurityId,jdbcType=VARCHAR},
+        <if test="available!=null">
+            #{available,jdbcType=DECIMAL},
+        </if>
+        <if test="amount!=null">
+            #{amount,jdbcType=DECIMAL},
+        </if>
+        <if test="channelId!=null">
+            #{channelId,jdbcType=INTEGER},
+        </if>
+        <if test="costPrice!=null">
+            #{costPrice,jdbcType=DECIMAL},
+        </if>
+        <if test="totalCost!=null">
+            #{totalCost,jdbcType=DECIMAL},
+        </if>
+        <if test="userId!=null">
+            #{userId,jdbcType=INTEGER},
+        </if>
+        <if test="customerId!=null">
+            #{customerId,jdbcType=INTEGER},
+        </if>
+        now())
+    </insert>
+
+    <select id="findByUserIdSecurityId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        from channel_security_position a
+        <include refid="userJoins"/>
+        where 1=1
+        <if test="userId != null">
+            AND a.user_id = #{userId}
+        </if>
+        <if test="customerId != null">
+            AND a.customer_id = #{customerId}
+        </if>
+        <if test="internalSecurityId != null">
+            AND a.internal_security_id = #{internalSecurityId}
+        </if>
+--         order by a.available
+    </select>
+
+    <select id="queryAmountByUserIdStockCode" resultType="java.math.BigDecimal">
+        SELECT
+        sum(usp.amount) amount
+        from user_security_position usp, stock_security ss
+        where usp.internal_security_id = ss.internal_security_id
+        <if test="userId != null">
+            AND usp.user_id = #{userId}
+        </if>
+        <if test="stockCode != null">
+            AND ss.code = #{stockCode}
+        </if>
+    </select>
+
+    <select id="queryAmountByUserIdStockType" resultType="java.math.BigDecimal">
+        SELECT
+        sum(usp.amount) amount
+        from user_security_position usp, stock_pool sp
+        where usp.internal_security_id = sp.id
+        <if test="userId != null">
+            AND usp.user_id = #{userId}
+        </if>
+        <if test="stockType != null">
+            AND sp.type = #{stockType}
+        </if>
+    </select>
+
+    <update id="updateAvailable">
+        update channel_security_position
+        <set>
+            <if test="availableChanged != null">
+                available = case
+                when available + (#{availableChanged}) >= 0 then
+                available + (#{availableChanged})
+                END,
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <update id="updateTotalCost">
+        update channel_security_position
+        <set>
+            <if test="totalCostChanged != null">
+                total_cost = total_cost + (#{totalCostChanged})
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <update id="updateAmountAndCostPrice">
+        update channel_security_position
+        <set>
+            <if test="costPrice != null and amountChanged != null">
+                cost_price = case
+                when amount + (#{amountChanged}) = 0 then 0
+                when amount + (#{amountChanged}) > 0 then
+                (cost_price * amount + #{costPrice} * #{amountChanged})/(amount + (#{amountChanged}))
+                
+                END,
+            </if>
+            <if test="amountChanged != null">
+                amount = CASE
+                when amount + (#{amountChanged}) >= 0 then
+                amount + (#{amountChanged})
+                
+                END,
+            </if>
+            <if test="costPrice!=null and amountChanged == null">
+                cost_price = #{costPrice},
+            </if>
+
+            <if test="costPrice != null and amountChanged != null">
+                total_cost = total_cost + #{costPrice} * #{amountChanged},
+            </if>
+            <if test="amountChanged != null and costPrice == null">
+                total_cost = total_cost + cost_price * #{amountChanged},
+            </if>
+            <if test="costPrice !=null and amountChanged  == null">
+                total_cost = #{costPrice}*amount,
+            </if>
+
+        </set>
+        where id = #{id}
+    </update>
+
+    <update id="adjustPosition">
+        update channel_security_position
+        set available = amount
+        <!--<![CDATA[-->
+        <!--WHERE DATE_FORMAT(update_time,'%Y-%m-%d') = DATE_FORMAT(NOW(),'%Y-%m-%d')-->
+        <!--]]>-->
+    </update>
+
+    <select id="verifyChannel" resultMap="BaseResultMap">
+        select
+        *
+        from channel_security_position a
+        WHERE 1=1
+        <if test="userId != null">
+            AND a.user_id = #{userId}
+        </if>
+        <if test="channelId != null">
+            AND a.channel_id = #{channelId}
+        </if>
+        <if test="internalSecurityId != null">
+            AND a.internal_security_id = #{internalSecurityId}
+        </if>
+    </select>
+
+    <select id="queryUserChannelPositionByIdStock" resultMap="UserChannelPositionMap">
+        SELECT
+        sum(csp.available) amount,
+        u.user_name,
+        csp.internal_security_id,
+        tc.`name` channel_name,
+        tc.`id`  channel_id
+        FROM
+        channel_security_position csp,
+        `user` u,
+        trade_channel tc
+        WHERE
+        u.id = csp.user_id
+        AND tc.id = csp.channel_id
+        <if test="userId != null">
+            AND csp.user_id = #{userId}
+        </if>
+        <if test="internalSecurityId != null">
+            AND  csp.internal_security_id = #{internalSecurityId}
+        </if>
+        GROUP BY tc.id
+    </select>
+</mapper>

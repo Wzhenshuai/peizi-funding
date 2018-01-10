@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.icaopan.admin.dao.AdminUserMapper">
+    <resultMap id="BaseResultMap" type="com.icaopan.admin.model.AdminUser">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="user_name" property="userName" jdbcType="VARCHAR"/>
+        <result column="pass_word" property="passWord" jdbcType="VARCHAR"/>
+        <result column="real_name" property="realName" jdbcType="VARCHAR"/>
+        <result column="phone" property="phone" jdbcType="VARCHAR"/>
+        <result column="email" property="email" jdbcType="VARCHAR"/>
+        <result column="qq" property="qq" jdbcType="VARCHAR"/>
+        <result column="weixin" property="weixin" jdbcType="VARCHAR"/>
+        <result column="customer_id" property="customerId" jdbcType="INTEGER"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime"/>
+    </resultMap>
+    <resultMap id="BaseResultMap2" type="com.icaopan.admin.model.AdminUser">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="user_name" property="userName" jdbcType="VARCHAR"/>
+        <result column="pass_word" property="passWord" jdbcType="VARCHAR"/>
+        <result column="real_name" property="realName" jdbcType="VARCHAR"/>
+        <result column="phone" property="phone" jdbcType="VARCHAR"/>
+        <result column="email" property="email" jdbcType="VARCHAR"/>
+        <result column="qq" property="qq" jdbcType="VARCHAR"/>
+        <result column="status" property="status" jdbcType="VARCHAR"/>
+        <result column="weixin" property="weixin" jdbcType="VARCHAR"/>
+        <result column="customer_id" property="customerId" jdbcType="INTEGER"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime"/>
+        <result column="customer_name" property="customerName" jdbcType="VARCHAR"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, user_name,pass_word, real_name, phone, email, qq, weixin,customer_id,create_time,modify_time,notes,status
+    </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from admin_user
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <select id="selectUserByUsernameAndPassword" resultMap="BaseResultMap"
+            parameterType="com.icaopan.admin.model.AdminUser">
+        select
+        <include refid="Base_Column_List"/>
+        from admin_user
+        where user_name=#{userName,jdbcType=VARCHAR}
+        and upper(pass_word)=#{passWord,jdbcType=VARCHAR}
+    </select>
+    <select id="selectUserByUserName" resultMap="BaseResultMap" parameterType="string">
+        select *
+        from admin_user
+        where user_name=#{userName,jdbcType=VARCHAR}
+    </select>
+    <select id="selectUserByPage" resultMap="BaseResultMap2">
+        select admin.*,c.name as customer_name
+        from admin_user admin left join customer c
+        on admin.customer_id=c.id
+        where 1=1
+        <if test="params.userName !=null">
+            and admin.user_name like #{params.userName}
+        </if>
+        <if test="params.realName != null">
+            and admin.real_name like #{params.realName}
+        </if>
+        <if test="params.phone != null">
+            and admin.phone like #{params.phone}
+        </if>
+        <if test="params.email != null">
+            and admin.email like #{params.email}
+        </if>
+        <if test="params.notes != null">
+            and admin.notes like #{params.notes}
+        </if>
+        <if test="params.customerId!=null">
+            and admin.customer_id=#{params.customerId}
+        </if>
+        <if test="params.status!=null">
+            and admin.status=#{params.status}
+        </if>
+        group by admin.id
+        order by create_time asc
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete from admin_user
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" parameterType="com.icaopan.admin.model.AdminUser">
+        insert into admin_user (id, user_name, pass_word,
+        real_name, phone, email,
+        qq, weixin,create_time,modify_time,status,notes,customer_id)
+        values (#{id,jdbcType=INTEGER}, #{userName,jdbcType=VARCHAR}, #{passWord,jdbcType=VARCHAR},
+        #{realName,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR},
+        #{qq,jdbcType=VARCHAR}, #{weixin,jdbcType=VARCHAR},#{createTime},#{modifyTime},#{status},#{notes},#{customerId})
+    </insert>
+    <insert id="insertSelective" parameterType="com.icaopan.admin.model.AdminUser">
+        insert into admin_user
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="userName != null">
+                username,
+            </if>
+            <if test="passWord != null">
+                password,
+            </if>
+            <if test="realName != null">
+                realname,
+            </if>
+            <if test="phone != null">
+                phone,
+            </if>
+            <if test="email != null">
+                mail,
+            </if>
+            <if test="qq != null">
+                QQ,
+            </if>
+            <if test="weixin != null">
+                weixin,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="userName != null">
+                #{userName,jdbcType=VARCHAR},
+            </if>
+            <if test="passWord != null">
+                #{passWord,jdbcType=VARCHAR},
+            </if>
+            <if test="realName != null">
+                #{realName,jdbcType=VARCHAR},
+            </if>
+            <if test="phone != null">
+                #{phone,jdbcType=VARCHAR},
+            </if>
+            <if test="email != null">
+                #{email,jdbcType=VARCHAR},
+            </if>
+            <if test="qq != null">
+                #{qq,jdbcType=VARCHAR},
+            </if>
+            <if test="weixin != null">
+                #{weixin,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKey" parameterType="com.icaopan.admin.model.AdminUser">
+        update admin_user
+        <set>
+            <if test="userName != null">
+                user_name = #{userName,jdbcType=VARCHAR},
+            </if>
+            <if test="passWord != null">
+                pass_word = #{passWord,jdbcType=VARCHAR},
+            </if>
+            <if test="realName != null">
+                real_name = #{realName,jdbcType=VARCHAR},
+            </if>
+            <if test="phone != null">
+                phone = #{phone,jdbcType=VARCHAR},
+            </if>
+            <if test="email != null">
+                email = #{email,jdbcType=VARCHAR},
+            </if>
+            <if test="qq != null">
+                qq = #{qq,jdbcType=VARCHAR},
+            </if>
+            <if test="weixin != null">
+                weixin = #{weixin,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+                status = #{status,jdbcType=VARCHAR},
+            </if>
+            <if test="notes != null">
+                notes = #{notes,jdbcType=VARCHAR},
+            </if>
+            <if test="customerId != null">
+                customer_id = #{customerId,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="modifyTime != null">
+                modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updatePassword" parameterType="com.icaopan.admin.model.AdminUser">
+        update admin_user
+        <set>
+            <if test="passWord != null">
+                pass_word = #{passWord,jdbcType=VARCHAR},
+            </if>
+            modify_time = now()
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+</mapper>

@@ -1,0 +1,8 @@
+|connect|
+|clean table|admin_user|
+
+|insert|admin_user|
+|id|email|user_name|pass_word|
+|999|zhang@email.com|zhangsan	|zhangsan|
+
+|commit|

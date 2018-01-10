@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.icaopan.admin.dao.AdminMenuMapper">
+    <resultMap id="BaseResultMap" type="com.icaopan.admin.model.AdminMenu">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="menu_parent" property="menuParent" jdbcType="VARCHAR"/>
+        <result column="menu_code" property="menuCode" jdbcType="VARCHAR"/>
+        <result column="menu_name" property="menuName" jdbcType="VARCHAR"/>
+        <result column="menu_url" property="menuUrl" jdbcType="VARCHAR"/>
+        <result column="menu_clazz" property="menuClazz" jdbcType="VARCHAR"/>
+        <result column="menu_order" property="menuOrder" jdbcType="VARCHAR"/>
+        <result column="menu_hidden" property="menuHidden" jdbcType="INTEGER"/>
+        <result column="menu_style" property="menuStyle" jdbcType="VARCHAR"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, menu_parent, menu_code, menu_name, menu_url, menu_clazz, menu_order, menu_hidden,
+        menu_style
+    </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from admin_menu
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <select id="selectAllMenu" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from admin_menu
+        order by menu_order asc
+    </select>
+
+    <select id="selectAllParentMenu" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM
+        admin_menu
+        WHERE
+        menu_hidden = '1'
+        AND menu_clazz = '0'
+        order by menu_order asc
+    </select>
+
+    <select id="selectAllSubMenu" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM
+        admin_menu
+        WHERE
+        menu_hidden = '1'
+        AND menu_clazz = '1'
+        AND menu_parent= #{menuId}
+        order by menu_order asc
+    </select>
+
+    <select id="selectAllParentMenuForShow" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from admin_menu where id in (
+        select menu_id from admin_permission where id in (
+        select apr.permission_id from admin_role_relate_permission apr,admin_role ar,admin_user_relate_role
+        aurr,admin_user au
+        where 1=1 and apr.role_id=ar.id and ar.id=aurr.role_id and aurr.user_id=au.id and au.id=#{userId}
+        ) and permission_code='find'
+        ) and menu_clazz = 0 and menu_hidden=1 order by menu_order asc;
+    </select>
+
+    <select id="selectAllSubMenuForShow" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from admin_menu where id in (
+        select menu_id from admin_permission where id in (
+        select apr.permission_id from admin_role_relate_permission apr,admin_role ar,admin_user_relate_role
+        aurr,admin_user au
+        where 1=1 and apr.role_id=ar.id and ar.id=aurr.role_id and aurr.user_id=au.id and au.id=#{userId}
+        ) and permission_code='find'
+        ) and menu_clazz = 1 and menu_hidden=1 and menu_parent= #{menuId} order by menu_order asc
+    </select>
+
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete from admin_menu
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" parameterType="com.icaopan.admin.model.AdminMenu">
+        insert into admin_menu (id, menu_parent, menu_code,
+        menu_name, menu_url, menu_clazz,
+        menu_order, menu_hidden, menu_style
+        )
+        values (#{id,jdbcType=INTEGER}, #{menuParent,jdbcType=VARCHAR}, #{menuCode,jdbcType=VARCHAR},
+        #{menuName,jdbcType=VARCHAR}, #{menuUrl,jdbcType=VARCHAR}, #{menuClazz,jdbcType=VARCHAR},
+        #{menuOrder,jdbcType=VARCHAR}, #{menuHidden,jdbcType=INTEGER}, #{menuStyle,jdbcType=VARCHAR}
+        )
+    </insert>
+    <insert id="insertSelective" parameterType="com.icaopan.admin.model.AdminMenu">
+        insert into admin_menu
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="menuParent != null">
+                menu_parent,
+            </if>
+            <if test="menuCode != null">
+                menu_code,
+            </if>
+            <if test="menuName != null">
+                menu_name,
+            </if>
+            <if test="menuUrl != null">
+                menu_url,
+            </if>
+            <if test="menuClazz != null">
+                menu_clazz,
+            </if>
+            <if test="menuOrder != null">
+                menu_order,
+            </if>
+            <if test="menuHidden != null">
+                menu_hidden,
+            </if>
+            <if test="menuStyle != null">
+                menu_style,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="menuParent != null">
+                #{menuParent,jdbcType=VARCHAR},
+            </if>
+            <if test="menuCode != null">
+                #{menuCode,jdbcType=VARCHAR},
+            </if>
+            <if test="menuName != null">
+                #{menuName,jdbcType=VARCHAR},
+            </if>
+            <if test="menuUrl != null">
+                #{menuUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="menuClazz != null">
+                #{menuClazz,jdbcType=VARCHAR},
+            </if>
+            <if test="menuOrder != null">
+                #{menuOrder,jdbcType=VARCHAR},
+            </if>
+            <if test="menuHidden != null">
+                #{menuHidden,jdbcType=INTEGER},
+            </if>
+            <if test="menuStyle != null">
+                #{menuStyle,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.icaopan.admin.model.AdminMenu">
+        update admin_menu
+        <set>
+            <if test="menuParent != null">
+                menu_parent = #{menuParent,jdbcType=VARCHAR},
+            </if>
+            <if test="menuCode != null">
+                menu_code = #{menuCode,jdbcType=VARCHAR},
+            </if>
+            <if test="menuName != null">
+                menu_name = #{menuName,jdbcType=VARCHAR},
+            </if>
+            <if test="menuUrl != null">
+                menu_url = #{menuUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="menuClazz != null">
+                menu_clazz = #{menuClazz,jdbcType=VARCHAR},
+            </if>
+            <if test="menuOrder != null">
+                menu_order = #{menuOrder,jdbcType=VARCHAR},
+            </if>
+            <if test="menuHidden != null">
+                menu_hidden = #{menuHidden,jdbcType=INTEGER},
+            </if>
+            <if test="menuStyle != null">
+                menu_style = #{menuStyle,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.icaopan.admin.model.AdminMenu">
+        update admin_menu
+        set menu_parent = #{menuParent,jdbcType=VARCHAR},
+        menu_code = #{menuCode,jdbcType=VARCHAR},
+        menu_name = #{menuName,jdbcType=VARCHAR},
+        menu_url = #{menuUrl,jdbcType=VARCHAR},
+        menu_clazz = #{menuClazz,jdbcType=VARCHAR},
+        menu_order = #{menuOrder,jdbcType=VARCHAR},
+        menu_hidden = #{menuHidden,jdbcType=INTEGER},
+        menu_style = #{menuStyle,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+</mapper>

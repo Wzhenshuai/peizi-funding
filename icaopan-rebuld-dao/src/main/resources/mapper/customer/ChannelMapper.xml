@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.icaopan.customer.dao.ChannelMapper">
+    <resultMap id="BaseResultMap" type="com.icaopan.customer.model.Channel">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="code" jdbcType="VARCHAR" property="code"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="tatio" jdbcType="DECIMAL" property="tatio"/>
+        <result column="min_cost" jdbcType="DECIMAL" property="minCost"/>
+        <result column="is_available" jdbcType="CHAR" property="isAvailable"/>
+        <result column="notes" jdbcType="VARCHAR" property="notes"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="channel_type" jdbcType="VARCHAR" property="channelType"/>
+        <result column="customer_id" jdbcType="INTEGER" property="customerId"/>
+        <result column="customer_name" jdbcType="VARCHAR" property="customerName"/>
+        <result column="cash_available" jdbcType="VARCHAR" property="cashAvailable"/>
+        <result column="priority_level" jdbcType="INTEGER" property="priorityLevel"/>
+        <result column="quota" jdbcType="DECIMAL" property="quota"/>
+        <result column="proportion" jdbcType="INTEGER" property="proportion"/>
+        <result column="user_channel_type" jdbcType="VARCHAR" property="userChannelTypeVal"/>
+        <result column="cash_uptime" jdbcType="TIMESTAMP" property="cashUptime"/>
+        <result column="total_assets" jdbcType="DECIMAL" property="totalAssets"/>
+        <result column="auto_fill" jdbcType="CHAR" property="autoFill"/>
+        <result column="trade_commission_rate" jdbcType="DECIMAL" property="tradeCommissionRate"/>
+        <result column="trade_min_cost" jdbcType="DECIMAL" property="tradeMinCost"/>
+    </resultMap>
+    <resultMap id="BuyLimitResultMap" type="com.icaopan.customer.model.BuyLimitChannel">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="code" jdbcType="VARCHAR" property="code"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="tatio" jdbcType="DECIMAL" property="tatio"/>
+        <result column="min_cost" jdbcType="DECIMAL" property="minCost"/>
+        <result column="is_available" jdbcType="CHAR" property="isAvailable"/>
+        <result column="notes" jdbcType="VARCHAR" property="notes"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="channel_type" jdbcType="VARCHAR" property="channelType"/>
+        <result column="customer_id" jdbcType="INTEGER" property="customerId"/>
+        <result column="customer_name" jdbcType="VARCHAR" property="customerName"/>
+        <result column="cash_available" jdbcType="VARCHAR" property="cashAvailable"/>
+        <result column="priority_level" jdbcType="INTEGER" property="priorityLevel"/>
+        <result column="quota" jdbcType="DECIMAL" property="quota"/>
+        <result column="proportion" jdbcType="INTEGER" property="proportion"/>
+        <result column="user_channel_type" jdbcType="VARCHAR" property="userChannelTypeVal"/>
+        <result column="cash_uptime" jdbcType="TIMESTAMP" property="cashUptime"/>
+        <result column="security_code" jdbcType="VARCHAR" property="securityCode"/>
+        <result column="amount" jdbcType="DECIMAL" property="amount"/>
+        <result column="position" jdbcType="DECIMAL" property="position"/>
+        <result column="unFilledQuantity" jdbcType="DECIMAL" property="unFilledQuantity"/>
+    </resultMap>
+    <select id="seleChannelById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select tc.*,c.name
+        from trade_channel tc left join customer c
+        on tc.customer_id=c.id
+        where tc.id = #{id,jdbcType=INTEGER}
+        group by tc.id
+    </select>
+	<select id="selectChannelByAccount" parameterType="java.lang.String" resultMap="BaseResultMap">
+		select tc.*,c.name
+        from trade_channel tc left join customer c
+        on tc.customer_id=c.id
+        where tc.code = #{account,jdbcType=VARCHAR}
+        limit 1
+	</select>
+    <select id="selectChannelByPage" resultMap="BaseResultMap">
+        select tc.*,c.name as customerName
+        from trade_channel tc left join customer c
+        on tc.customer_id=c.id
+        where 1 = 1
+        <if test="params.name != null and params.name !='' ">
+            and tc.name like CONCAT('%',#{params.name},'%')
+        </if>
+        <if test="params.code != null and params.code !='' ">
+            and tc.code like CONCAT('%',#{params.code},'%')
+        </if>
+        <if test="params.isAvailable != null">
+            and tc.is_available = #{params.isAvailable}
+        </if>
+        <if test="params.autoFill != null">
+            and tc.auto_fill = #{params.autoFill}
+        </if>
+        <if test="params.customerId != null">
+            and tc.customer_id = #{params.customerId }
+        </if>
+        <if test="params.channelId != null">
+            and tc.id = #{params.channelId }
+        </if>
+        <if test="params.channelType!=null and params.channelType!='' ">
+            and tc.channel_type=#{params.channelType}
+        </if>
+        group by tc.id
+        ORDER BY tc.create_time DESC
+    </select>
+
+    <select id="selectUnchecked_AM" resultMap="BaseResultMap">
+        SELECT
+          code,name,cash_available
+        FROM
+          trade_channel
+        WHERE
+        is_available = 1 AND id not IN (
+          SELECT DISTINCT channel_id FROM trade_channel_placement
+        ) AND notes not LIKE "%测试%"
+    </select>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        select tc.*,c.name as customerName
+        from trade_channel tc left join customer c
+        on tc.customer_id=c.id
+        group by tc.id
+        ORDER BY create_time asc
+    </select>
+
+    <insert id="insert" parameterType="com.icaopan.customer.model.Channel">
+        insert into trade_channel (code, name,
+        tatio, min_cost, is_available,
+        notes, update_time, create_time,
+        channel_type, customer_id,cash_available,auto_fill,trade_commission_rate,
+        trade_min_cost)
+        values (#{code,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR},
+        #{tatio,jdbcType=DECIMAL}, #{minCost,jdbcType=DECIMAL}, #{isAvailable,jdbcType=CHAR},
+        #{notes,jdbcType=VARCHAR}, now(), now(),
+        #{channelType,jdbcType=VARCHAR},
+        #{customerId,jdbcType=INTEGER},#{cashAvailable,jdbcType=DECIMAL},#{autoFill,jdbcType=CHAR},#{tradeCommissionRate},
+        #{tradeMinCost})
+    </insert>
+
+    <update id="updateBySelective" parameterType="com.icaopan.customer.model.Channel">
+        update trade_channel
+        <set>
+            <if test="tatio != null">
+                tatio = #{tatio,jdbcType=DECIMAL},
+            </if>
+            <if test="minCost != null">
+                min_cost = #{minCost,jdbcType=DECIMAL},
+            </if>
+            <if test="isAvailable != null">
+                is_available = #{isAvailable,jdbcType=CHAR},
+            </if>
+            <if test="autoFill !=null">
+            	auto_fill=#{autoFill,jdbcType=CHAR},
+            </if>
+            <if test="notes != null">
+                notes = #{notes,jdbcType=VARCHAR},
+            </if>
+            <if test="channelType != null">
+                channel_type = #{channelType,jdbcType=VARCHAR},
+            </if>
+            <if test="cashAvailable != null">
+                cash_available = #{cashAvailable},
+            </if>
+            <if test="customerId!=null">
+                customer_id=#{customerId},
+            </if>
+            <if test="tradeCommissionRate!=null">
+                trade_commission_rate=#{tradeCommissionRate},
+            </if>
+            <if test="tradeMinCost!=null">
+                trade_min_cost=#{tradeMinCost},
+            </if>
+            update_time = now()
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <update id="updateCashAvailable">
+        UPDATE trade_channel
+        <set>
+            cash_available= case 
+                when (#{cashAvailable}) >= 0 then
+                (#{cashAvailable})
+                else 0
+                END,
+            cash_uptime = now(),
+            <if test="totalAssets !=null and totalAssets !=0 ">
+                total_Assets = #{totalAssets}
+            </if>
+        </set>
+        WHERE code = #{code}
+    </update>
+
+    <select id="selectChannelByUserId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        SELECT
+        t.*,
+        u.priority_level,
+        u.quota,
+        u.proportion,
+        u.user_channel_type
+        FROM
+        trade_channel t
+        LEFT JOIN user_channel u ON u.channel_id = t.id
+        WHERE
+        u.user_id = #{userId}
+        order by u.priority_level
+
+    </select>
+
+    <select id="selectChannelsByCustomerId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select *
+        from trade_channel
+        where customer_id = #{customerId,jdbcType=INTEGER}
+        and is_available = '1'
+        group by id
+    </select>
+
+    <select id="selectChanelsByCustomerIds" resultMap="BaseResultMap">
+        select *
+        from trade_channel
+        where is_available = '1'
+        <if test="customerIds != null and customerIds.length!=0">
+            and customer_id in
+            <foreach collection=" customerIds" item="sta" index="index"
+                     open="(" close=")" separator=",">
+                #{sta}
+            </foreach>
+        </if>
+        group by id
+    </select>
+
+    <select id="selectChannelsByCustomerIdNotInUserId" resultMap="BaseResultMap">
+        select
+        *
+        from
+        trade_channel
+        where
+        customer_id = #{customerId,jdbcType=INTEGER}
+        and is_available = '1'
+        and
+        id not in (select channel_id from user_channel where user_id = #{userId,jdbcType=INTEGER})
+    </select>
+
+    <select id="verifyCode" parameterType="string" resultType="boolean">
+        <![CDATA[
+         select count(id) from trade_channel where code=#{code} 
+        ]]>
+    </select>
+
+    <select id="selectBuyLimitChannels" resultMap="BuyLimitResultMap">
+        SELECT
+        t.*,
+        u.priority_level,
+        u.quota,
+        u.proportion,
+        u.user_channel_type,
+        #{securityCode} as security_code,
+        (SELECT amount FROM trade_channel_limit tcl WHERE tcl.channel_id = t.id and tcl.security_code = #{securityCode})as amount,
+	    (select sum(amount) from channel_security_position csp where csp.channel_id = t.id and csp.internal_security_id = #{internalSecurityId}) AS position,
+        (select sum(quantity- fill_quantity) from trade_channel_placement tcp where tcp.channel_id = t.id and tcp.security_code = #{securityCode} and tcp.`status` in("SENDING","SENDACK","PARTIALLYFILLED","CANCELLING"))as unFilledQuantity
+        FROM
+        trade_channel t
+        LEFT JOIN user_channel u ON u.channel_id = t.id
+        WHERE
+        u.user_id = #{userId} 
+        and t.is_available = 1
+        order by u.priority_level
+
+    </select>
+
+</mapper>

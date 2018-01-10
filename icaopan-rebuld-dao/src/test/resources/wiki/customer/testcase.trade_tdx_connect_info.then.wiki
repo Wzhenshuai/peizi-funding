@@ -1,0 +1,5 @@
+|connect|
+
+|query|select * from trade_tdx_connect_info|
+|account_no|trade_account|gddm_sz|gddm_sh|jy_password|tx_password|ip|port|version|yyb_id|exchange_id_sh|exchange_id_sz|o_name|description|dll_name|
+|110220330|110220330|001002003|110220331|123321|123321|10.10.10.10|8080|2.3|2|1|0|招商证券|单侧|dllName|

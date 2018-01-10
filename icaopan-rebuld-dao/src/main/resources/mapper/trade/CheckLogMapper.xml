@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.icaopan.trade.dao.CheckLogMapper">
+    <resultMap id="BaseResultMap" type="com.icaopan.trade.model.CheckLog">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="result" jdbcType="VARCHAR" property="result"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="operation_name" jdbcType="VARCHAR" property="operationName"/>
+    </resultMap>
+
+    <resultMap id="CheckPositionResult" type="com.icaopan.trade.bean.CheckPositionResult">
+        <id column="user_id" jdbcType="INTEGER" property="userId"/>
+        <result column="user_name" jdbcType="VARCHAR" property="userName"/>
+        <result column="local_code" jdbcType="VARCHAR" property="localCode"/>
+        <result column="channelPositionSum" jdbcType="DECIMAL" property="channelPositionSum"/>
+        <result column="userPositionSum" jdbcType="DECIMAL" property="userPositionSum"/>
+        <result column="flowAmount" jdbcType="DECIMAL" property="flowAmount"/>
+        <result column="userAmount" jdbcType="DECIMAL" property="userAmount"/>
+        <result column="difference" jdbcType="DECIMAL" property="difference"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.icaopan.trade.model.CheckLog">
+        insert into check_log (
+        update_time,
+        result,
+        operation_name
+        )
+        VALUES(
+            now(),
+            #{result},
+        #{operationName})
+    </insert>
+
+    <insert id="insertList" parameterType="java.util.List">
+        insert into check_log (
+        update_time,
+        result,
+        operation_name
+        )
+        VALUES
+        <foreach collection="list" item="checkLog" index="index" open="(" separator="),(" close=")">
+            now(),
+            #{checkLog.result},
+            #{checkLog.operationName}
+        </foreach>
+    </insert>
+
+    <select id="selectCheckLog" resultMap="BaseResultMap">
+       SELECT
+            *
+        FROM
+            check_log
+        WHERE
+            update_time BETWEEN DATE_SUB(CURDATE(), INTERVAL 1 DAY)
+        AND DATE_SUB(CURDATE(), INTERVAL - 1 DAY)
+        ORDER BY update_time DESC
+    </select>
+
+    <select id="checkPosition" resultMap="CheckPositionResult">
+        SELECT
+            csp.user_id,
+            u.user_name,
+            csp.internal_security_id,
+            s.LOCAL_CODE,
+            s.SHORT_NAME_CN,
+        SUM(csp.amount) AS channelPositionSum,
+        usp.amount AS userPositionSum,
+        SUM(csp.amount) - usp.amount AS difference
+        FROM
+            channel_security_position AS csp,
+            user_security_position AS usp,
+            USER AS u,
+            rd_security AS s
+        WHERE
+            csp.user_id = usp.user_id
+        AND csp.internal_security_id = usp.internal_security_id
+        AND u.id = csp.user_id
+        AND csp.internal_security_id = s.INTERNAL_SECURITY_ID
+        GROUP BY
+            user_id,
+            internal_security_id
+        HAVING SUM(csp.amount) != usp.amount
+    </select>
+    <select id="checkCashAmount" resultMap="CheckPositionResult">
+        SELECT
+        a.user_id,
+        u.user_name,
+        u.amount AS userAmount,
+        SUM(a.amount) AS flowAmount,
+        SUM(a.amount) - u.amount AS difference
+        FROM
+        (
+        SELECT
+        id,
+        user_id,
+
+        IF (
+        type = "SECURITY_BUY",
+        - adjust_amount - commission_fee - stampduty_fee - transfer_fee,
+        adjust_amount - commission_fee - stampduty_fee - transfer_fee
+        ) AS amount
+        FROM
+        trade_flow
+        WHERE
+        type IN (
+        'CASH_ADD',
+        'CASH_REDUCE',
+        'SECURITY_SELL',
+        'SECURITY_BUY'
+        )
+        ) a,
+        `user` u
+        WHERE
+        u.id = a.user_id
+        AND u.real_name != 'test-trader'
+        AND u.customer_id NOT IN (8028, 8030)
+        GROUP BY
+        user_id
+        HAVING
+        u.amount != flowAmount
+        AND <![CDATA[ difference >= 1
+        ]]>
+    </select>
+</mapper>

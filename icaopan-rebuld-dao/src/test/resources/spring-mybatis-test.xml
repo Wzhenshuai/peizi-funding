@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans  
+                        http://www.springframework.org/schema/beans/spring-beans-4.0.xsd  
+                        http://www.springframework.org/schema/context  
+                        http://www.springframework.org/schema/context/spring-context-4.0.xsd  
+                        http://www.springframework.org/schema/tx
+    					http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+ 						http://www.springframework.org/schema/aop 
+ 						http://www.springframework.org/schema/aop/spring-aop-4.0.xsd">
+
+    <!-- 自动扫描 -->
+    <context:component-scan base-package="com.icaopan.*.dao"></context:component-scan>
+    <context:component-scan base-package="com.icaopan.*.service.impl"></context:component-scan>
+    <!-- 引入配置文件 -->
+    <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="location" value="classpath:jtester.properties"/>
+    </bean>
+
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="${database.driverClassName}"></property>
+        <property name="url" value="${database.url}"></property>
+        <property name="username" value="${database.userName}"></property>
+        <property name="password" value="${database.password}"></property>
+    </bean>
+
+    <!-- 分页插件 -->
+    <bean id="statementHandlerInterceptor" class="com.icaopan.util.page.SpringMybatisPageInterceptor"/>
+
+    <!-- spring和MyBatis完美整合,不需要mybatis的配置映射文件 -->
+    <bean id="SessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"></property>
+        <!-- 自动扫描mapping.xml文件 -->
+        <property name="mapperLocations" value="classpath:mapper/*/*.xml"></property>
+        <!-- 加载分页插件 -->
+        <property name="plugins">
+            <array>
+                <ref bean="statementHandlerInterceptor"/>
+            </array>
+        </property>
+    </bean>
+
+    <!-- Spring 自动扫描所有的Dao层方法-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.icaopan.*.dao"></property>
+        <property name="sqlSessionFactoryBeanName" value="SessionFactory"></property>
+    </bean>
+
+    <!-- (事务管理)transaction manager, use JtaTransactionManager for global tx -->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+
+    <!-- (事务通知)定义对不同方法开头，采用不同的回滚机制-->
+    <tx:advice id="transactionAdvice" transaction-manager="transactionManager">
+        <tx:attributes>
+            <!-- 针对一些特殊异常配置 ：rollback-for="java.lang.Exception" no-rollback-for="java.lang.RuntimeException"  -->
+            <tx:method name="delete*" propagation="REQUIRED" read-only="false" rollback-for="java.lang.Exception"/>
+            <tx:method name="save*" propagation="REQUIRED" read-only="false" rollback-for="java.lang.Exception"/>
+            <tx:method name="update*" propagation="REQUIRED" read-only="false" rollback-for="java.lang.Exception"/>
+            <tx:method name="find*" propagation="SUPPORTS"/>
+            <tx:method name="get*" propagation="SUPPORTS"/>
+            <tx:method name="select*" propagation="SUPPORTS"/>
+        </tx:attributes>
+    </tx:advice>
+
+    <!-- 通过AOP执行事务 （控制到Service层）-->
+    <aop:config>
+        <aop:pointcut id="transactionPointCut" expression="execution(public * com.icaopan.*.service.*.*(..))"/>
+        <aop:advisor pointcut-ref="transactionPointCut" advice-ref="transactionAdvice"/>
+    </aop:config>
+</beans>

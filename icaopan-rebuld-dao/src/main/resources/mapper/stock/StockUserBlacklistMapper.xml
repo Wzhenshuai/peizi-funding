@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.icaopan.stock.dao.StockUserBlacklistMapper">
+
+    <resultMap id="BaseResultMap" type="com.icaopan.stock.model.StockUser">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="stock_code" jdbcType="VARCHAR" property="stockCode"/>
+        <result column="stock_name" jdbcType="VARCHAR" property="stockName"/>
+        <result column="user_id" jdbcType="INTEGER" property="userId"/>
+        <result column="customer_id" jdbcType="INTEGER" property="customerId"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        a.id,a.stock_code,a.stock_name,a.user_id,a.customer_id,a.update_time
+    </sql>
+
+    <select id="queryStockCntByUserIdAndCode" resultType="java.lang.Integer">
+        SELECT COUNT(1)
+        FROM stock_user_blacklist a
+        WHERE a.user_id = #{userId}
+        and a.stock_code = #{stockCode}
+    </select>
+
+    <select id="queryByUserId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        SELECT
+          <include refid="Base_Column_List"/>
+        FROM stock_user_blacklist a
+        WHERE a.user_id = #{userId}
+    </select>
+
+    <insert id="insert" parameterType="java.util.List">
+        INSERT INTO stock_user_blacklist (
+            stock_code,
+            stock_name,
+            user_id,
+            customer_id,
+            update_time
+        )
+        values
+        <foreach collection="stockUserList" item="stockUsers" index="index" open="(" separator="),(" close=")">
+            #{stockUsers.stockCode, jdbcType=VARCHAR},
+            #{stockUsers.stockName, jdbcType=VARCHAR},
+            #{stockUsers.userId, jdbcType=INTEGER},
+            #{stockUsers.customerId, jdbcType=DECIMAL},now()
+        </foreach>
+    </insert>
+
+    <delete id="deleteByUserId" parameterType="java.lang.Integer">
+        DELETE FROM stock_user_blacklist
+        WHERE user_id = #{userId}
+    </delete>
+
+    <update id="update" parameterType="java.util.List">
+        <foreach collection="stockUserList" item="stockUsers" index="index" separator=",">
+            update stock_user_blacklist
+            <set>
+                <if test="channelId != null">
+                    stock_code = #{stockUsers.stockCode, jdbcType=VARCHAR},
+                </if>
+                <if test="priorityLevel != null">
+                    stock_name = #{stockUsers.stockName, jdbcType=VARCHAR},
+                </if>
+                <if test="proportion != null">
+                    customer_id = #{stockUsers.customerId,jdbcType=INTEGER},
+                </if>
+                    update_time = now()
+            </set>
+            WHERE user_id = #{stockUsers.userId,jdbcType=INTEGER}
+        </foreach>
+    </update>
+</mapper>

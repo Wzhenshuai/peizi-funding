@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.icaopan.customer.dao.ChannelLimitMapper">
+    <resultMap id="BaseResultMap" type="com.icaopan.customer.model.ChannelLimit">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="security_code" jdbcType="VARCHAR" property="securityCode"/>
+        <result column="security_name" jdbcType="VARCHAR" property="securityName"/>
+        <result column="channel_name" jdbcType="VARCHAR" property="channelName"/>
+        <result column="amount" jdbcType="DECIMAL" property="amount"/>
+        <result column="channel_id" jdbcType="INTEGER" property="channelId"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+    </resultMap>
+
+    <select id="selectByChannelId" resultMap="BaseResultMap">
+        select tcl.*, tc.name channelName
+        from trade_channel_limit tcl left join trade_channel tc
+        on tcl.channel_id = tc.id
+        where 1 = 1
+        <if test="channelId != null and channelId !='' ">
+            and tcl.channel_id = #{channelId,jdbcType=INTEGER}
+        </if>
+        ORDER BY tcl.create_time DESC
+    </select>
+
+
+    <insert id="insert" parameterType="com.icaopan.customer.model.ChannelLimit">
+        insert into trade_channel_limit (channel_id, security_code,security_name,
+        amount, create_time, update_time)
+        values (#{channelId,jdbcType=INTEGER}, #{securityCode,jdbcType=VARCHAR},
+        #{securityName,jdbcType=VARCHAR}, #{amount,jdbcType=DECIMAL}, now(), now())
+    </insert>
+
+    <update id="update" parameterType="com.icaopan.customer.model.ChannelLimit">
+        update trade_channel_limit
+        <set>
+            <if test="channelLimit.channelId != null and channelLimit.channelId != '' ">
+                channel_id = #{channelLimit.channelId,jdbcType=INTEGER},
+            </if>
+            <if test="channelLimit.securityCode != null  and channelLimit.securityCode != '' ">
+                security_code = #{channelLimit.securityCode,jdbcType=CHAR},
+            </if>
+            <if test="channelLimit.securityName != null  and channelLimit.securityName != '' ">
+                security_name = #{channelLimit.securityName,jdbcType=CHAR},
+            </if>
+            <if test="channelLimit.amount != null">
+                amount = #{channelLimit.amount,jdbcType=DECIMAL},
+            </if>
+            update_time = now()
+        </set>
+        where id = #{channelLimit.id,jdbcType=INTEGER}
+    </update>
+    
+    <delete id="deleteChannelLimit" parameterType="java.lang.Integer">
+        DELETE FROM trade_channel_limit
+        WHERE id=#{id,jdbcType=INTEGER};
+    </delete>
+
+</mapper>

@@ -1,0 +1,6 @@
+|connect|
+
+|query|select * from sys_dict|
+|id|value|label|type|description|del_flag|sort|
+|2|已成|委托状态|placement_type|委托状态|1|0|
+|1|已报|委托状态|placement_type|委托状态|0|0|

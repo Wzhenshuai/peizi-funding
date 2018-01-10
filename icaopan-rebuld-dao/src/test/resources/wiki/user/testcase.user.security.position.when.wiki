@@ -1,0 +1,9 @@
+|connect|
+|clean table|user_security_position|
+|insert|user_security_position|
+|id|internal_security_id|available|amount|update_time|cost_price|user_id|customer_id|
+|1|603309|1000|1000|2016-11-21 19:14:34|2|1|2|
+|2|603319|1000|1000|2016-11-21 11:14:34|3|1|3|
+|3|603312|0|0|2016-11-21 11:14:34|3|2|4|
+
+|commit|

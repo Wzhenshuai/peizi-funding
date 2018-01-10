@@ -1,0 +1,5 @@
+|connect|
+
+|query|select * from trade_channel|
+|id|code|name|tatio|min_cost|is_available|notes|channel_type|customer_id|
+|1001|10080|张三|0.004|200000|0|通道管理2|1|2002|

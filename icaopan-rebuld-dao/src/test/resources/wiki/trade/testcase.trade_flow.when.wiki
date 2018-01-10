@@ -1,0 +1,10 @@
+|connect|
+|clean table|trade_flow|
+
+|insert|trade_flow|
+|security_code|adjust_quantity|adjust_amount|type|cash|financing|cash_amount|financing_amount|user_id|customer_id|create_time|
+|600022|1000|12230|CASH_ADD|1000000|500000|1000000|500000|101|60011|2017-03-22 16:12:57|
+|600022|1000|12230|CASH_ADD|1000000|500000|1000000|500000|101|60011|2017-03-22 16:12:57|
+|600022|1000|12230|CASH_ADD|1000000|500000|1000000|500000|101|60011|2017-03-22 16:12:57|
+
+|commit|

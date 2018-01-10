@@ -1,0 +1,8 @@
+|connect|
+|clean table|user_channel|
+|insert|user_channel|
+|id|channel_id|user_id|priority_level|
+|1|2|1|1|
+|2|2|5|1|
+
+|commit|

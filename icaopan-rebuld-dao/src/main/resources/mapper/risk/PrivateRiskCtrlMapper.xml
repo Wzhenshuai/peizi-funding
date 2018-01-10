@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.icaopan.risk.dao.PrivateRiskCtrlMapper">
+    <resultMap id="BaseResultMap" type="com.icaopan.risk.bean.TdxPrivateUser">
+        <id column="id" jdbcType="INTEGER" property="id" />
+        <result column="o_name" jdbcType="VARCHAR" property="nickName" />
+        <result column="account_no" jdbcType="VARCHAR" property="accountNo" />
+        <result column="trade_account" jdbcType="VARCHAR" property="tradeAccount" />
+        <result column="tx_password" jdbcType="VARCHAR" property="txPassword" />
+        <result column="jy_password" jdbcType="VARCHAR" property="jYPassWord" />
+        <result column="gddm_sz" jdbcType="VARCHAR" property="gddmSz" />
+        <result column="gddm_sh" jdbcType="VARCHAR" property="gddmSh" />
+        <result column="warn_line" jdbcType="VARCHAR" property="warnLine" />
+        <result column="open_line" jdbcType="VARCHAR" property="openLine" />
+        <result column="dll_name" jdbcType="VARCHAR" property="dllName" />
+        <result column="status" jdbcType="VARCHAR" property="status" />
+        <result column="last_operate" jdbcType="VARCHAR" property="lastOperate" />
+        <result column="remark" jdbcType="VARCHAR" property="remark" />
+        <result column="update_by" jdbcType="VARCHAR" property="updateBy" />
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+        <result column="customer_id" jdbcType="VARCHAR" property="customerId" />
+        <result column="server_ip" jdbcType="VARCHAR" property="serverIp" />
+        <result column="server_port" jdbcType="INTEGER" property="port" />
+        <result column="broker_name" jdbcType="VARCHAR" property="brokerName" />
+        <result column="version" jdbcType="VARCHAR" property="version" />
+        <result column="server_name" jdbcType="VARCHAR" property="serverName" />
+        <result column="yyb_code" jdbcType="INTEGER" property="yybCode" />
+        <result column="yyb_name" jdbcType="VARCHAR" property="yybName" />
+        <result column="total_amount" jdbcType="VARCHAR" property="totalAmount" />
+        <result column="available" jdbcType="VARCHAR" property="available" />
+        <result column="error_Info" jdbcType="VARCHAR" property="errorInfo"/>
+    </resultMap>
+
+    <resultMap id="BrokerBaseResultMap" type="com.icaopan.risk.bean.TdxBrokerBase">
+        <id column="id" jdbcType="INTEGER" property="id" />
+        <result column="remark" jdbcType="VARCHAR" property="remark" />
+        <result column="version" jdbcType="VARCHAR" property="version" />
+        <result column="broker_name" jdbcType="VARCHAR" property="brokerName" />
+    </resultMap>
+
+    <resultMap id="BaseServerMap" type="com.icaopan.risk.bean.TdxServerInfo">
+        <id column="server_id" jdbcType="INTEGER" property="id" />
+        <result column="server_ip" jdbcType="VARCHAR" property="serverIp" />
+        <result column="port" jdbcType="INTEGER" property="port" />
+        <result column="server_name" jdbcType="VARCHAR" property="serverName" />
+        <result column="belong_id" jdbcType="VARCHAR" property="belongId" />
+    </resultMap>
+
+    <resultMap id="yybResultMap" type="com.icaopan.risk.bean.TdxYyb">
+        <id column="id" jdbcType="INTEGER" property="id" />
+        <result column="yyb_code" jdbcType="INTEGER" property="yybCode" />
+        <result column="yyb_name" jdbcType="VARCHAR" property="yybName" />
+        <result column="remark" jdbcType="VARCHAR" property="remark" />
+        <result column="belong_id" jdbcType="VARCHAR" property="belongId" />
+    </resultMap>
+
+    <resultMap id="customerResultMap" type="com.icaopan.risk.bean.PrivateCustomer">
+        <id column="ID" jdbcType="VARCHAR" property="id" />
+        <result column="LOGINNAME" jdbcType="VARCHAR" property="loginName" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,
+        o_name,
+        account_no,
+        trade_account,
+        tx_password,
+        jy_password,
+        gddm_sz,
+        gddm_sh,
+        warn_line,
+        open_line,
+        status,
+        last_operate,
+        dll_name,
+        remark,
+        update_by,
+        update_time,
+        customer_id,
+        broker_name,
+        server_ip,
+        server_port,
+        version,
+        server_name,
+        yyb_code,
+        yyb_name,
+        total_amount,
+        available,
+        error_Info
+    </sql>
+
+    <select id="selectPrivateUsers" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from tdx_personal_user_manage
+        WHERE 1=1
+        <if test="param.status != null">
+            AND status=#{param.status}
+        </if>
+        <if test="param.tradeAccount != null">
+            AND trade_account=#{param.tradeAccount}
+        </if>
+        <if test="param.customerId != null">
+            AND customer_id=#{param.customerId}
+        </if>
+        <if test="param.id != null">
+            AND id=#{param.id}
+        </if>
+        order by error_Info DESC ,(total_amount / open_line )
+    </select>
+
+    <select id="selectPrivateCustomers" resultType="com.icaopan.risk.bean.PrivateCustomer">
+      select
+        *
+      from admin_user;
+    </select>
+
+    <select id="getServerInfoByBelongId" parameterType="java.lang.String" resultMap="BaseServerMap">
+        select
+		 server_id,
+		  server_ip,
+		  port ,
+		  server_name,
+		  belong_id
+	    from tdx_server
+	    where belong_id = #{belongId}
+    </select>
+
+    <select id="getBrokerBaseInfoById" parameterType="int" resultType="com.icaopan.risk.bean.TdxBrokerBase">
+        select
+	  		id,
+	  		remark,
+	  		broker_name,
+	  		version
+  		from
+  			tdx_brokerBase
+  		  WHERE
+  		    id = #{id}
+    </select>
+
+    <select id="getYYBByBelongId" parameterType="java.lang.String" resultMap="yybResultMap">
+        select
+		 id,
+		 yyb_code,
+		 yyb_name,
+		 remark,
+		 belong_id
+		 from tdx_yyb
+		 where belong_id = #{belongId}
+    </select>
+
+    <select id="getAllBrokerBaseInfo" resultMap="BrokerBaseResultMap">
+	  	select
+	  		id,
+	  		remark,
+	  		broker_name,
+	  		version
+  		from
+  			tdx_brokerBase
+    </select>
+
+    <select id="getBaseServerInfoById" parameterType="int" resultMap="BaseServerMap">
+	  	select
+		 server_id,
+		  server_ip,
+		  port,
+		  server_name,
+		  belong_id
+	    from tdx_server
+	    where server_id = #{id}
+    </select>
+
+    <select id="getYybById" parameterType="int" resultMap="yybResultMap">
+		select
+		 id,
+		 yyb_code,
+		 yyb_name,
+		 remark,
+		 belong_id
+		 from tdx_yyb
+		 where id = #{id}
+    </select>
+
+    <insert id="addPrivateUser" parameterType="com.icaopan.risk.bean.TdxPrivateUser">
+        insert into tdx_personal_user_manage(
+            <if test="accountNo != null">
+                account_no,
+            </if>
+            <if test="tradeAccount != null" >
+                trade_account,
+            </if>
+            <if test="id != null">
+                id,
+            </if>
+            <if test="nickName != null">
+                o_name,
+            </if>
+            <if test="txPassword != null" >
+                tx_password,
+            </if>
+            <if test="jYPassWord != null">
+                jy_password,
+            </if>
+            <if test="gddmSz != null" >
+                gddm_sz,
+            </if>
+            <if test="gddmSh != null" >
+                gddm_sh,
+            </if>
+            <if test="warnLine != null" >
+                warn_line,
+            </if>
+            <if test="openLine != null" >
+                open_line,
+            </if>
+            <if test="dllName != null" >
+                dll_name,
+            </if>
+            <if test="remark != null" >
+                remark,
+            </if>
+            <if test="customerId != null" >
+                customer_id,
+            </if>
+            <if test="brokerinfoId != null" >
+                brokerInfo_id,
+            </if>
+            <if test="serverIp != null">
+                server_ip,
+            </if>
+            <if test="version != null">
+                version,
+            </if>
+            <if test="port != null">
+                server_port,
+            </if>
+            <if test="serverName != null">
+                server_name,
+            </if>
+            <if test="yybCode != null">
+                yyb_code,
+            </if>
+            <if test="yybName != null">
+                yyb_name
+            </if>
+            )
+        values(
+            <if test="accountNo != null" >
+                #{accountNo},
+            </if>
+            <if test="tradeAccount != null" >
+                #{tradeAccount},
+            </if>
+            <if test="id != null" >
+                #{id},
+            </if>
+            <if test="nickName != null" >
+                #{nickName},
+            </if>
+
+            <if test="txPassword != null" >
+                #{txPassword},
+            </if>
+            <if test="jYPassWord != null" >
+                #{jYPassWord},
+            </if>
+            <if test="gddmSz != null" >
+                #{gddmSz},
+            </if>
+            <if test="gddmSh != null" >
+                #{gddmSh},
+            </if>
+            <if test="warnLine != null">
+                #{warnLine},
+            </if>
+            <if test="openLine != null" >
+                #{openLine},
+            </if>
+            <if test="dllName != null" >
+                #{dllName},
+            </if>
+            <if test="remark != null" >
+                #{remark},
+            </if>
+            <if test="customerId != null" >
+                #{customerId},
+            </if>
+            <if test="brokerinfoId != null" >
+                #{brokerinfoId},
+            </if>
+            <if test="serverIp != null" >
+                #{serverIp},
+            </if>
+            <if test="version != null" >
+                #{version},
+            </if>
+            <if test="port != null" >
+                #{port},
+            </if>
+            <if test="serverName != null" >
+                #{serverName},
+            </if>
+            <if test="yybCode !=null" >
+                #{yybCode},
+            </if>
+            <if test="yybName != null" >
+                #{yybName}
+            </if>
+            );
+    </insert>
+
+    <update id="updatePrivateRiskCtrl" parameterType="com.icaopan.risk.bean.TdxPrivateUser">
+        update tdx_personal_user_manage
+        <set>
+            <if test="openLine != null">
+                open_line = #{openLine},
+            </if>
+            <if test="warnLine != null">
+                warn_line = #{warnLine},
+            </if>
+            <if test="nickName != null">
+                o_name = #{nickName},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="remark != null">
+                remark = #{remark},
+            </if>
+            modify_time = now()
+        </set>
+        where id = #{id}
+    </update>
+
+    <update id="updatePassWord" parameterType="com.icaopan.risk.bean.PassWordParam">
+        update tdx_personal_user_manage
+        <set>
+            <if test="txPassWord != null">
+                tx_password = #{txPassWord},
+            </if>
+            <if test="jyPassWord != null">
+                jy_password = #{jyPassWord},
+            </if>
+            modify_time = now()
+        </set>
+        where id = #{id}
+    </update>
+
+
+</mapper>

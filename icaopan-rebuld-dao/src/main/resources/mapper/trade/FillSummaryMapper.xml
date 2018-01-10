@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.icaopan.trade.dao.FillSummaryMapper">
+    <resultMap id="BaseResultMap" type="com.icaopan.trade.model.FillSummary">
+        <result column="security_code" jdbcType="VARCHAR" property="securityCode"/>
+        <result column="security_Name" jdbcType="VARCHAR" property="securityName"/>
+        <result column="channel_name" jdbcType="VARCHAR" property="channelName"/>
+        <result column="user_name" jdbcType="VARCHAR" property="userName"/>
+        <result column="quantity" jdbcType="DECIMAL" property="quantity"/>
+        <result column="side" jdbcType="VARCHAR" property="side"/>
+        <result column="price" jdbcType="DECIMAL" property="price"/>
+        <result column="amount" jdbcType="DECIMAL" property="amount"/>
+        <result column="fill_times" jdbcType="INTEGER" property="fillTimes"/>
+    </resultMap>
+
+
+    <sql id="Base_Column_List">
+        security_code, quantity, side, price, amount, fill_times
+    </sql>
+
+
+    <select id="selectFillSummaryByPage" resultMap="BaseResultMap">
+        select fm.security_code,sc.name security_name, sum(quantity) as quantity, side, avg(price) as price , sum(fm.amount) as amount, count(*)
+        as fill_times,tc.name as channel_name,u.user_name
+        from (
+        select tf.id,tf.security_code, tf.quantity, tf.side, tf.price,
+        tf.amount,tf.fill_time,tf.user_id,tf.channel_id,tf.customer_id from trade_fill tf
+        where 1 = 1
+        <if test="params.securityCode != null and params.securityCode != '' ">
+            and tf.security_code = #{params.securityCode}
+        </if>
+        <if test="params.side != null and params.side != '' ">
+            and tf.side = #{params.side}
+        </if>
+        <if test="params.userId != null and params.userId != '' ">
+            and tf.user_id = #{params.userId}
+        </if>
+        <if test="params.channelId != null and params.channelId != '' ">
+            and tf.channel_id = #{params.channelId}
+        </if>
+        <if test="params.customerId != null and params.customerId != '' ">
+            and tf.customer_id = #{params.customerId}
+        </if>
+        <if test="params.startTime != null and params.startTime != '' ">
+            <![CDATA[
+    		and	tf.fill_time >= date(#{params.startTime})
+    	]]>
+        </if>
+        <if test="params.endTime != null and params.endTime != '' ">
+            <![CDATA[
+           and  tf.fill_time <= date(#{params.endTime})
+         ]]>
+        </if>
+        union
+        select tfh.id,tfh.security_code, tfh.quantity, tfh.side, tfh.price,
+        tfh.amount,tfh.fill_time,tfh.user_id,tfh.channel_id,tfh.customer_id from trade_fill_history tfh
+        where 1 = 1
+        <if test="params.securityCode != null and params.securityCode != '' ">
+            and tfh.security_code = #{params.securityCode}
+        </if>
+        <if test="params.side != null and params.side != '' ">
+            and tfh.side = #{params.side}
+        </if>
+        <if test="params.userId != null and params.userId != '' ">
+            and tfh.user_id = #{params.userId}
+        </if>
+        <if test="params.channelId != null and params.channelId != '' ">
+            and tfh.channel_id = #{params.channelId}
+        </if>
+        <if test="params.customerId != null and params.customerId != '' ">
+            and tfh.customer_id = #{params.customerId}
+        </if>
+        <if test="params.startTime != null and params.startTime != '' ">
+            <![CDATA[
+    		and	tfh.fill_time >= date(#{params.startTime})
+    	]]>
+        </if>
+        <if test="params.endTime != null and params.endTime != '' ">
+            <![CDATA[
+           and  tfh.fill_time <= date(#{params.endTime})
+         ]]>
+        </if>
+        ) as fm
+        LEFT JOIN user u ON fm.user_id = u.id
+        LEFT JOIN trade_channel tc ON tc.id = fm.channel_id
+        LEFT JOIN customer c ON c.id = fm.customer_id
+        LEFT JOIN stock_security sc on sc.code=fm.security_code
+        group BY security_code,side
+        <if test="params.type==1">,tc.id</if>
+        <if test="params.type==2">,u.id</if>
+        
+    </select>
+    
+    <select id="selectFillSummaryAmount" resultType="DOUBLE" parameterType="com.icaopan.trade.bean.FillSummaryParams">
+        select  sum(fm.amount) as amount
+        from (
+        select tf.id,tf.security_code, tf.quantity, tf.side, tf.price,
+        tf.amount,tf.fill_time,tf.user_id,tf.channel_id,tf.customer_id from trade_fill tf
+        union
+        select tfh.id,tfh.security_code, tfh.quantity, tfh.side, tfh.price,
+        tfh.amount,tfh.fill_time,tfh.user_id,tfh.channel_id,tfh.customer_id from trade_fill_history tfh
+        ) as fm
+        LEFT JOIN user u ON fm.user_id = u.id
+        LEFT JOIN trade_channel tc ON tc.id = fm.channel_id
+        LEFT JOIN customer c ON c.id = fm.customer_id
+        where 1 = 1
+        <if test="securityCode != null and securityCode != '' ">
+            and fm.security_code = #{securityCode}
+        </if>
+        <if test="side != null and side != '' ">
+            and fm.side = #{side}
+        </if>
+        <if test="userId != null and userId != '' ">
+            and fm.user_id = #{userId}
+        </if>
+        <if test="channelId != null and channelId != '' ">
+            and fm.channel_id = #{channelId}
+        </if>
+        <if test="customerId != null and customerId != '' ">
+            and fm.customer_id = #{customerId}
+        </if>
+        <if test="startTime != null and startTime != '' ">
+            <![CDATA[
+    		and	fm.fill_time >= date(#{startTime})
+    	]]>
+        </if>
+        <if test="endTime != null and endTime != '' ">
+            <![CDATA[
+           and  fm.fill_time <= date(#{endTime})
+         ]]>
+        </if>
+        
+    </select>
+
+
+</mapper>

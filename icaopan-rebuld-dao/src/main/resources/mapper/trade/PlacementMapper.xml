@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.icaopan.trade.dao.PlacementMapper">
+    <resultMap id="BaseResultMap" type="com.icaopan.trade.model.Placement">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="security_code" jdbcType="VARCHAR" property="securityCode"/>
+        <result column="security_name" jdbcType="VARCHAR" property="securityName"/>
+        <result column="side" jdbcType="VARCHAR" property="side"/>
+        <result column="user_name" jdbcType="VARCHAR" property="userName"/>
+        <result column="quantity" jdbcType="DECIMAL" property="quantity"/>
+        <result column="price" jdbcType="DECIMAL" property="price"/>
+        <result column="amount" jdbcType="DECIMAL" property="amount"/>
+        <result column="status" jdbcType="CHAR" property="status"/>
+        <result column="is_sz_transfer_fee" jdbcType="CHAR" property="isSzTransferFee"/>
+        <result column="fill_quantity" jdbcType="DECIMAL" property="fillQuantity"/>
+        <result column="fill_amount" jdbcType="DECIMAL" property="fillAmount"/>
+        <result column="fill_price" jdbcType="DECIMAL" property="fillPrice"/>
+        <result column="invalid_quantity" jdbcType="DECIMAL" property="invalidQuantity"/>
+        <result column="ratio_fee" jdbcType="DECIMAL" property="ratioFee"/>
+        <result column="min_cost" jdbcType="DECIMAL" property="minCost"/>
+        <result column="user_id" jdbcType="INTEGER" property="userId"/>
+        <result column="customer_id" jdbcType="INTEGER" property="customerId"/>
+        <result column="time" jdbcType="TIMESTAMP" property="time"/>
+        <result column="cancelled_quantity" jdbcType="DECIMAL" property="cancelQuantity"/>
+        <result column="invalid_quantity" jdbcType="DECIMAL" property="invalidQuantity"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, security_code, side, quantity, price, amount, status, is_sz_transfer_fee,
+        fill_quantity, fill_amount, fill_price, cancelled_quantity, invalid_quantity, ratio_fee, min_cost, user_id,
+        customer_id, time
+    </sql>
+
+    <select id="selectById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from trade_placement
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <select id="placementSelectByPage" resultMap="BaseResultMap">
+        select
+        tp.id,
+        security_code,
+        side,
+        quantity,
+        price,
+        tp.amount,
+        tp.STATUS,
+        is_sz_transfer_fee,
+        fill_quantity,
+        fill_amount,
+        fill_price,
+        cancelled_quantity,
+        invalid_quantity,
+        tp.ratio_fee,
+        tp.min_cost,
+        user_id,
+        tp.customer_id,
+        time,
+        u.user_name username,
+        sc.name security_name
+        from trade_placement tp
+        LEFT JOIN `user` u ON tp.user_id = u.id
+        LEFT JOIN stock_security sc on sc.code=tp.security_code
+        where 1 = 1
+        <if test="params.id !=null">
+        	AND tp.id=#{params.id}
+        </if>
+        <if test="params.status != null and params.status != '' ">
+            and tp.status = #{params.status}
+        </if>
+        <if test="params.customerId != null and params.customerId != '' ">
+            and tp.customer_id = #{params.customerId}
+        </if>
+        <if test="params.userId != null and params.userId != '' ">
+            and u.id = #{params.userId}
+        </if>
+        <if test="params.userName != null and params.userName!=''">
+            and u.user_name = #{params.userName}
+        </if>
+        <if test="params.securityCode != null and params.securityCode != '' ">
+            and tp.security_code = #{params.securityCode}
+        </if>
+        <if test="params.createDate != null and params.createDate != '' ">
+            <![CDATA[
+           and  date(tp.time) = date(#{params.createDate})
+         ]]>
+        </if>
+        ORDER BY time DESC
+    </select>
+
+    <select id="selectPlacementNotEnd" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        tp.id,
+        security_code,
+        side,
+        quantity,
+        price,
+        tp.amount,
+        tp.STATUS,
+        is_sz_transfer_fee,
+        fill_quantity,
+        fill_amount,
+        fill_price,
+        cancelled_quantity,
+        invalid_quantity,
+        tp.ratio_fee,
+        tp.min_cost,
+        user_id,
+        tp.customer_id,
+        time,
+        u.user_name username
+        from trade_placement tp
+        LEFT JOIN `user` u ON tp.user_id = u.id
+        where 1 = 1
+        and tp.status not in ('INVALID','FILLED','CANCELLED')
+        and tp.user_id = #{userId,jdbcType=INTEGER}
+        ORDER BY time DESC
+
+    </select>
+
+    <select id="selectBuyPlacementNotEnd" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        tp.id,
+        security_code,
+        side,
+        quantity,
+        price,
+        tp.amount,
+        tp.STATUS,
+        is_sz_transfer_fee,
+        fill_quantity,
+        fill_amount,
+        fill_price,
+        cancelled_quantity,
+        invalid_quantity,
+        tp.ratio_fee,
+        tp.min_cost,
+        user_id,
+        tp.customer_id,
+        time,
+        u.user_name username
+        from trade_placement tp
+        LEFT JOIN `user` u ON tp.user_id = u.id
+        where 1 = 1
+        and tp.side = 'BUY'
+        and tp.status not in ('INVALID','FILLED','CANCELLED')
+        and tp.user_id = #{userId,jdbcType=INTEGER}
+    </select>
+
+    <select id="selectPlacementNotEndByStockType" resultMap="BaseResultMap">
+        select
+        tp.id,
+        security_code,
+        side,
+        quantity,
+        price,
+        tp.amount,
+        tp.STATUS,
+        is_sz_transfer_fee,
+        fill_quantity,
+        fill_amount,
+        fill_price,
+        cancelled_quantity,
+        invalid_quantity,
+        tp.ratio_fee,
+        tp.min_cost,
+        user_id,
+        tp.customer_id,
+        time,
+        u.user_name username
+        from trade_placement tp
+        LEFT JOIN `user` u ON tp.user_id = u.id
+        LEFT JOIN stock_pool sp ON tp.security_code = left(sp.stock_code, 6)
+        where 1 = 1
+        and tp.side = 'BUY'
+        and tp.status not in ('INVALID','FILLED','CANCELLED')
+        and tp.user_id = #{userId,jdbcType=INTEGER}
+        and sp.type = #{stockPoolType,jdbcType=INTEGER}
+    </select>
+
+
+    <select id="selectPlacement" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        tp.id,
+        security_code,
+        side,
+        quantity,
+        price,
+        tp.amount,
+        tp.STATUS,
+        is_sz_transfer_fee,
+        fill_quantity,
+        fill_amount,
+        fill_price,
+        cancelled_quantity,
+        invalid_quantity,
+        tp.ratio_fee,
+        tp.min_cost,
+        user_id,
+        tp.customer_id,
+        time,
+        u.user_name username
+        from trade_placement tp
+        LEFT JOIN `user` u ON tp.user_id = u.id
+        where 1 = 1
+        and tp.user_id = #{userId,jdbcType=INTEGER}
+        ORDER BY time DESC
+
+    </select>
+    <delete id="deletePlacementToday">
+        delete from trade_placement
+    </delete>
+
+    <insert id="insert" parameterType="com.icaopan.trade.model.Placement" useGeneratedKeys="true" keyProperty="id">
+        insert into trade_placement (security_code, side,
+        quantity, price, amount,
+        status, is_sz_transfer_fee, fill_quantity,
+        fill_amount, fill_price, ratio_fee,
+        min_cost, user_id, customer_id, time)
+        values (#{securityCode,jdbcType=VARCHAR}, #{side,jdbcType=VARCHAR},
+        #{quantity,jdbcType=DECIMAL}, #{price,jdbcType=DECIMAL}, #{amount,jdbcType=DECIMAL},
+        #{status,jdbcType=CHAR}, #{isSzTransferFee,jdbcType=CHAR}, 0,
+        0, 0, #{ratioFee,jdbcType=DECIMAL},
+        #{minCost,jdbcType=DECIMAL}, #{userId,jdbcType=INTEGER}, #{customerId,jdbcType=INTEGER}, now())
+    </insert>
+
+    <update id="updatePlaceQuantityAndAmount">
+        update trade_placement
+        <set>
+            <![CDATA[fill_price = (fill_amount + #{changeAmount}) / (fill_quantity + #{changeQuantity}),
+      	fill_quantity = fill_quantity + #{changeQuantity},
+      	fill_amount = fill_amount + #{changeAmount} ]]>
+        </set>
+        where id = #{placementId}
+    </update>
+    <!--更新委托的状态 -->
+    <update id="updatePlacementStatus">
+        update trade_placement
+        <set>
+            status = #{tradeStatus}
+        </set>
+        where id = #{placementId}
+    </update>
+    <!--更新撤单的数量 -->
+    <update id="updateCancelQuantity">
+        update trade_placement
+        <set>
+            cancelled_quantity = cancelled_quantity + #{cancelQuantity}
+        </set>
+        where id = #{placementId}
+    </update>
+    <!-- 跟新废单的数量 -->
+    <update id="updateInvalidQuantity">
+        update trade_placement
+        <set>
+            invalid_quantity = invalid_quantity + #{invalidQuantity}
+        </set>
+        where id = #{placementId}
+    </update>
+
+    <select id="selectCurrentPlacementNotEnd" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from trade_placement
+        where status not in ('INVALID','FILLED','CANCELLED')
+    </select>
+
+    <select id="selectAllPlacement" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from trade_placement
+        WHERE DATE_FORMAT(time,'%Y-%m-%d') = DATE_FORMAT(NOW(),'%Y-%m-%d')
+    </select>
+</mapper>

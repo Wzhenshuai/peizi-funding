@@ -1,0 +1,18 @@
+.btn-resize{
+	width: 100%;
+	border-radius: 1%;
+}
+
+
+.login-form{
+	margin-top:16em;
+	width: 350px;
+	padding: 1em;
+	background-color:white;
+	border-radius: 1%;
+	float: none;
+}
+
+.re-box{
+	float: right;
+}

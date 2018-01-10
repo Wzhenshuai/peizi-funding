@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<taglib xmlns="http://java.sun.com/xml/ns/j2ee"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd"
+  version="2.0">
+    
+  <description>JSTL 1.1 functions library</description>
+  <display-name>JSTL functions sys</display-name>
+  <tlib-version>1.1</tlib-version>
+  <short-name>fns</short-name>
+  <uri>http://java.sun.com/jsp/jstl/functionss</uri>
+
+  <function>
+    <description>获取select下拉框</description>
+    <name>getDicOptions</name>
+    <function-class>com.icaopan.sys.util.DictUtils</function-class>
+    <function-signature>java.lang.String getDicOptions(java.lang.String)</function-signature>
+    <example>${fns:getDicOptions()}</example>
+  </function>
+
+  <function>
+    <description>获取通道信息select下拉框</description>
+    <name>getChanelOpt</name>
+    <function-class>com.icaopan.sys.util.ChannelUtils</function-class>
+    <function-signature>java.lang.String getChanelOpt()</function-signature>
+    <example>${fns:getChanelOpt()}</example>
+  </function>
+
+  <function>
+    <description>获取可用通道通道信息(过滤停用通道)select下拉框</description>
+    <name>getAvailableChannelsOpt</name>
+    <function-class>com.icaopan.sys.util.ChannelUtils</function-class>
+    <function-signature>java.lang.String getAvailableChannelsOpt()</function-signature>
+    <example>${fns:getAvailableChannelsOpt()}</example>
+  </function>
+
+  <function>
+    <description>获取客户信息select下拉框</description>
+    <name>getCustomers</name>
+    <function-class>com.icaopan.sys.util.CustomerUtils</function-class>
+    <function-signature>java.lang.String getCustomers()</function-signature>
+    <example>${fns:getCustomers()}</example>
+  </function>
+
+  <function>
+    <description>获取用户信息select下拉框</description>
+    <name>getUsers</name>
+    <function-class>com.icaopan.sys.util.UserUtils</function-class>
+    <function-signature>java.lang.String getUsers()</function-signature>
+    <example>${fns:getUsers()}</example>
+  </function>
+
+  <function>
+    <description>获取管理员用户信息select下拉框</description>
+    <name>getAdminUsers</name>
+    <function-class>com.icaopan.sys.util.UserUtils</function-class>
+    <function-signature>java.lang.String getAdminUsers()</function-signature>
+    <example>${fns:getAdminUsers()}</example>
+  </function>
+
+  <function>
+    <description>获取券商信息select下拉框</description>
+    <name>getBrokers</name>
+    <function-class>com.icaopan.sys.util.RiskCtrlUtils</function-class>
+    <function-signature>java.lang.String getBrokers()</function-signature>
+    <example>${fns:getBrokers()}</example>
+  </function>
+
+  <function>
+    <description>获取交易类型买入卖出select下拉框</description>
+    <name>getTradeType</name>
+    <function-class>com.icaopan.sys.util.FillUtils</function-class>
+    <function-signature>java.lang.String getTradeType()</function-signature>
+    <example>${fns:getTradeType()}</example>
+  </function>
+
+
+</taglib>

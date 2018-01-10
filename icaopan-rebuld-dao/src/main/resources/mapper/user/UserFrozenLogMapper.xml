@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.icaopan.user.dao.UserFrozenLogMapper">
+  <resultMap id="BaseResultMap" type="com.icaopan.user.model.UserFrozenLog">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="user_name" jdbcType="VARCHAR" property="userName" />
+    <result column="frozen" jdbcType="DECIMAL" property="frozen" />
+    <result column="type" jdbcType="VARCHAR" property="type" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, user_name,user_id, frozen, type, create_time, remark
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from user_frozen_log
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <select id="selectByPage" resultMap="BaseResultMap">
+    select
+    fl.id,fl.user_name, fl.user_id, fl.frozen, fl.type, fl.create_time, fl.remark
+    from user_frozen_log fl
+    LEFT JOIN user u ON u.id = fl.user_id
+    WHERE 1 = 1
+    <if test="params.customerId != null">
+      AND u.customer_id = #{params.customerId}
+    </if>
+    <if test="params.userId != null">
+      AND fl.user_id = #{params.userId}
+    </if>
+    ORDER BY fl.create_time DESC
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from user_frozen_log
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.icaopan.user.model.UserFrozenLog">
+    insert into user_frozen_log (user_id, frozen,
+      type,user_name, create_time, remark
+      )
+    values (#{userId,jdbcType=INTEGER}, #{frozen,jdbcType=DECIMAL},
+      #{type,jdbcType=VARCHAR},#{userName,jdbcType=VARCHAR}, now(), #{remark,jdbcType=VARCHAR}
+      )
+  </insert>
+</mapper>

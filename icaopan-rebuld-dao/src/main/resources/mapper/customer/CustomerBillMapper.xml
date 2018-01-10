@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.icaopan.customer.dao.CustomerBillMapper">
+    <resultMap id="BaseResultMap" type="com.icaopan.customer.model.CustomerBill">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="channel_id" jdbcType="INTEGER" property="channelId"/>
+        <result column="operation_type" jdbcType="VARCHAR" property="operationType"/>
+        <result column="balance" jdbcType="DECIMAL" property="balance"/>
+        <result column="fill_amount" jdbcType="DECIMAL" property="fillAmount"/>
+        <result column="fee" jdbcType="DECIMAL" property="fee"/>
+        <result column="operation_user" jdbcType="VARCHAR" property="operationUser"/>
+        <result column="operation_time" jdbcType="TIMESTAMP" property="operationTime"/>
+        <result column="customer_id" jdbcType="INTEGER" property="customerId"/>
+        <result column="customer_name" jdbcType="VARCHAR" property="customerName"/>
+        <result column="channel_name" jdbcType="VARCHAR" property="channelName"/>
+    </resultMap>
+
+    <resultMap id="customerBillResultMap" type="com.icaopan.customer.bean.CustomerBillFeeResult">
+        <result column="min_cost" jdbcType="DECIMAL" property="minCost"/>
+        <result column="fee" jdbcType="DECIMAL" property="fee"/>
+        <result column="customer_id" jdbcType="INTEGER" property="customerId"/>
+        <result column="channel_id" jdbcType="INTEGER" property="channelId"/>
+    </resultMap>
+
+    <select id="selectCustomerBillByPage" resultMap="BaseResultMap">
+        select bill.*,c.name as customer_name,cl.name as channel_name
+        from customer_bill bill left join customer c on bill.customer_id=c.id
+        left join trade_channel cl on bill.channel_id=cl.id
+        where 1 = 1
+        <if test="params.channelId != null and params.channelId!=''">
+            and bill.channel_id = #{params.channelId}
+        </if>
+        <if test="params.operationType != null and params.operationType!=''">
+            and bill.operation_type = #{params.operationType}
+        </if>
+        <if test="params.customerId != null and params.customerId!=''">
+            and bill.customer_id = #{params.customerId}
+        </if>
+        <if test="params.startDate != null and params.startDate!=''">
+            and operation_time>=date(#{params.startDate})
+        </if>
+        <if test="params.endDate != null and params.endDate!=''">
+            <![CDATA[ and DATE_FORMAT(operation_time,'Y-%m-%d')<=DATE_FORMAT(#{params.endDate},'Y-%m-%d')]]>
+        </if>
+        group by bill.id
+        ORDER BY bill.operation_time DESC
+    </select>
+
+    <insert id="insertBill" parameterType="com.icaopan.customer.model.CustomerBill">
+        insert into customer_bill ( channel_id, operation_type,
+        balance, fill_amount, fee,
+        operation_user, operation_time, customer_id
+        )
+        values ( #{channelId,jdbcType=INTEGER}, #{operationType,jdbcType=VARCHAR},
+        #{balance,jdbcType=DECIMAL}, #{fillAmount,jdbcType=DECIMAL}, #{fee,jdbcType=DECIMAL},
+        #{operationUser,jdbcType=VARCHAR}, now(), #{customerId,jdbcType=INTEGER}
+        )
+    </insert>
+    <insert id="generateCustomerBill" parameterType="java.util.List">
+        INSERT INTO customer_bill (
+        channel_id,
+        operation_type,
+        operation_user,
+        operation_time,
+        fill_amount,
+        fee,
+        customer_id
+        ) SELECT
+        tf.channel_id,
+        '交易成交',
+        'clearing',
+        NOW(),
+        SUM(tf.amount),
+        SUM(tf.amount) * tc.tatio *  <![CDATA[ -1 ]]>,
+        tf.customer_id
+        FROM
+        trade_fill tf LEFT JOIN trade_channel tc ON tf.channel_id = tc.id
+        GROUP BY
+        channel_id
+    </insert>
+
+    <insert id="insertList" parameterType="java.util.List">
+        insert into customer_bill (
+        channel_id, operation_type,
+        operation_user, operation_time,
+        fill_amount, fee,
+        customer_id)
+        values
+        <foreach collection="customerBillList" item="item" separator=",">
+            (
+            #{item.channelId}, #{item.operationType},
+            #{item.operationUser}, #{item.operationTime},
+            #{item.fillAmount}, #{item.fee},
+            #{item.customerId}
+            )
+        </foreach>
+    </insert>
+
+    <select id="getCustomerBillByMonthly" parameterType="com.icaopan.customer.model.CustomerBill"
+            resultMap="BaseResultMap">
+        select SUM(fee) fee,
+        channel_id
+        FROM customer_bill bill
+        WHERE 1 =1
+        <if test="customerBill.channelId != null and customerBill.channelId!=''">
+            AND bill.channel_id = #{customerBill.channelId}
+        </if>
+        <if test="customerBill.operationType != null and customerBill.operationType!=''">
+            AND bill.operation_type = #{customerBill.operationType}
+        </if>
+        <if test="customerBill.operationUser != null and customerBill.operationUser!=''">
+            AND bill.operation_user = #{customerBill.operationUser}
+        </if>
+        AND DATE_FORMAT(bill.operation_time,'%Y-%m') = (DATE_FORMAT(#{customerBill.operationTime},'%Y-%m'))
+        GROUP BY
+        channel_id
+    </select>
+
+    <select id="selectCustomerCollection" resultMap="customerBillResultMap">
+        SELECT
+        SUM(cb.fee) fee,
+        cb.customer_id,
+        c.min_cost
+        FROM
+        customer_bill cb
+        LEFT JOIN customer c ON cb.customer_id = c.id
+        WHERE
+        <choose>
+            <when test="beforeMonth != null">
+                DATE_FORMAT(cb.operation_time, '%Y-%m') = #{beforeMonth}
+                AND cb.customer_id NOT IN
+                <foreach collection="customerIdList" index="index" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </when>
+            <otherwise>
+                DATE_FORMAT(cb.operation_time, '%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d')
+            </otherwise>
+        </choose>
+        GROUP BY
+        customer_id
+    </select>
+
+
+    <select id="selectCustomerCollectionChannel" resultMap="customerBillResultMap">
+        SELECT
+        SUM(cb.fee) fee,
+        cb.customer_id,
+        tc.min_cost,
+        cb.channel_id
+        FROM
+        customer_bill cb
+        LEFT JOIN trade_channel tc ON cb.channel_id = tc.id
+        WHERE
+        cb.customer_id IN
+        <foreach collection="customerIdList" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        <if test="beforeMonth != null">
+            AND DATE_FORMAT(cb.operation_time, '%Y-%m') = #{beforeMonth}
+        </if>
+        GROUP BY
+        channel_id
+    </select>
+
+
+    <!-- 按月份统计当月扣费金额 -->
+    <select id="countMonthSumFee" resultType="java.math.BigDecimal">
+        select sum(fee)
+        from customer_bill
+        where operation_type IN ('月费扣除','交易成交')
+        AND customer_id = #{customerId}
+        and DATE_FORMAT(operation_time, '%Y-%m') = #{month}
+    </select>
+
+    <!-- 按月份统计实际交易费总额 -->
+    <select id="countMonthTradeFee" resultType="java.math.BigDecimal">
+        select sum(fee)
+        from customer_bill
+        where operation_type='交易成交'
+        AND customer_id = #{customerId}
+        and DATE_FORMAT(operation_time, '%Y-%m') = #{month}
+    </select>
+
+    <!--    <select id="selectCustomerCollectionMonthly" resultMap="BaseResultMap">
+            SELECT
+            SUM(fee) fee,
+            customer_id
+            FROM
+            customer_bill
+            WHERE
+            DATE_FORMAT(operation_time, '%Y-%m-%d') = DATE_FORMAT(#{beforeMonth}, '%Y-%m-%d')
+            GROUP BY
+            customer_id
+        </select>-->
+
+</mapper>

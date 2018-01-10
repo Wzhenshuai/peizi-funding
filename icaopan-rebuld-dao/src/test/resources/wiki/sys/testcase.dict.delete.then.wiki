@@ -1,0 +1,5 @@
+|connect|
+
+|query|select count(*) as r from sys_dict|
+|r|
+|0|

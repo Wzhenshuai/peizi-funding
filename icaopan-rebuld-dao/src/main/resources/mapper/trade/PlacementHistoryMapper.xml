@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.icaopan.trade.dao.PlacementHistoryMapper">
+    <resultMap id="BaseResultMap" type="com.icaopan.trade.model.PlacementHistory">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="security_code" jdbcType="VARCHAR" property="securityCode"/>
+        <result column="security_name" jdbcType="VARCHAR" property="securityName"/>
+        <result column="side" jdbcType="VARCHAR" property="side"/>
+        <result column="user_name" jdbcType="VARCHAR" property="userName"/>
+        <result column="quantity" jdbcType="DECIMAL" property="quantity"/>
+        <result column="price" jdbcType="DECIMAL" property="price"/>
+        <result column="amount" jdbcType="DECIMAL" property="amount"/>
+        <result column="status" jdbcType="VARCHAR" property="status"/>
+        <result column="commission_fee" jdbcType="DECIMAL" property="commissionFee"/>
+        <result column="stampduty_fee" jdbcType="DECIMAL" property="stampDutyFee"/>
+        <result column="transfer_fee" jdbcType="DECIMAL" property="transferFee"/>
+        <result column="fill_quantity" jdbcType="DECIMAL" property="fillQuantity"/>
+        <result column="fill_amount" jdbcType="DECIMAL" property="fillAmount"/>
+        <result column="fill_price" jdbcType="DECIMAL" property="fillPrice"/>
+        <result column="user_id" jdbcType="INTEGER" property="userId"/>
+        <result column="date_time" jdbcType="TIMESTAMP" property="dateTime"/>
+        <result column="placement_id" jdbcType="INTEGER" property="placementId"/>
+        <result column="customer_id" jdbcType="INTEGER" property="customerId"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, security_code, side, quantity, price, amount, status, commission_fee,
+        stampduty_fee, transfer_fee, fill_quantity, fill_amount, fill_price, user_id, date_time, placement_id,
+        customer_id
+    </sql>
+
+    <select id="selectPlacementHistoryByPage" parameterType="com.icaopan.util.page.Page" resultMap="BaseResultMap">
+        select
+        tph.id,
+        security_code,
+        side,
+        quantity,
+        price,
+        tph.amount,
+        tph.STATUS,
+        commission_fee,
+        stampduty_fee,
+        transfer_fee,
+        fill_quantity,
+        fill_amount,
+        fill_price,
+        user_id,
+        date_time,
+        placement_id,
+        tph.customer_id,
+        u.user_name username,
+        sc.name security_name
+        from trade_placement_history tph
+        LEFT JOIN `user` u ON tph.user_id = u.id
+        LEFT JOIN stock_security sc on sc.code=tph.security_code
+        where 1 = 1
+        <if test="params.securityCode != null and params.securityCode != '' ">
+            and tph.security_code = #{params.securityCode}
+        </if>
+        <if test="params.side != null and params.side != ''">
+            and tph.side = #{params.side}
+        </if>
+        <if test="params.status != null and params.status !=''">
+            and tph.status = #{params.status}
+        </if>
+        <if test="params.userId != null">
+            and u.id = #{params.userId}
+        </if>
+        <if test="params.userName != null and params.userName!=''">
+            and u.user_name = #{params.userName}
+        </if>
+        <if test="params.customerId != null">
+            and tph.customer_id = #{params.customerId}
+        </if>
+        <if test="params.startTime != null and params.startTime != ''">
+            <![CDATA[
+    		and	date(tph.date_time) >= date(#{params.startTime})
+    	]]>
+        </if>
+        <if test="params.endTime != null and params.endTime != '' ">
+            <![CDATA[
+           and  date(tph.date_time) <= date(#{params.endTime})
+         ]]>
+        </if>
+        ORDER BY date_time DESC
+    </select>
+
+    <insert id="insert" parameterType="com.icaopan.trade.model.PlacementHistory">
+        insert into trade_placement_history (security_code, side,
+        quantity, price, amount,
+        status, commission_fee, stampduty_fee,
+        transfer_fee, fill_quantity, fill_amount,
+        fill_price, user_id, date_time, placement_id,customer_id)
+        values ( #{securityCode,jdbcType=VARCHAR}, #{side,jdbcType=VARCHAR},
+        #{quantity,jdbcType=DECIMAL}, #{price,jdbcType=DECIMAL}, #{amount,jdbcType=DECIMAL},
+        #{status,jdbcType=VARCHAR}, #{commissionFee,jdbcType=DECIMAL}, #{stampDutyFee,jdbcType=DECIMAL},
+        #{transferFee,jdbcType=DECIMAL}, #{fillQuantity,jdbcType=DECIMAL}, #{fillAmount,jdbcType=DECIMAL},
+        #{fillPrice,jdbcType=DECIMAL}, #{userId,jdbcType=INTEGER}, #{dateTime}, #{placementId,jdbcType=INTEGER},
+        #{customerId,jdbcType=INTEGER})
+    </insert>
+
+    <insert id="insertList" parameterType="java.util.List">
+        insert into trade_placement_history (security_code, side,
+        quantity, price, amount,
+        status, commission_fee, stampduty_fee,
+        transfer_fee, fill_quantity, fill_amount,
+        fill_price, user_id, date_time, placement_id,customer_id)
+        values
+        <foreach collection="placementHistoryList" item="item" index="index" separator=",">
+            (
+            #{item.securityCode,jdbcType=VARCHAR}, #{item.side,jdbcType=VARCHAR},
+            #{item.quantity,jdbcType=DECIMAL}, #{item.price,jdbcType=DECIMAL}, #{item.amount,jdbcType=DECIMAL},
+            #{item.status,jdbcType=VARCHAR}, #{item.commissionFee,jdbcType=DECIMAL},
+            #{item.stampDutyFee,jdbcType=DECIMAL},
+            #{item.transferFee,jdbcType=DECIMAL}, #{item.fillQuantity,jdbcType=DECIMAL},
+            #{item.fillAmount,jdbcType=DECIMAL},
+            #{item.fillPrice,jdbcType=DECIMAL}, #{item.userId,jdbcType=INTEGER}, #{item.dateTime},
+            #{item.placementId,jdbcType=INTEGER}, #{item.customerId,jdbcType=INTEGER}
+            )
+        </foreach>
+
+    </insert>
+
+</mapper>

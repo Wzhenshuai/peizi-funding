@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.icaopan.admin.dao.AdminPermissionMapper">
+    <resultMap id="BaseResultMap" type="com.icaopan.admin.model.AdminPermission">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="permission_name" property="permissionName"
+                jdbcType="VARCHAR"/>
+        <result column="menu_id" property="menuId" jdbcType="VARCHAR"/>
+        <result column="permission_desc" property="permissionDesc"
+                jdbcType="VARCHAR"/>
+        <result column="permission_code" property="permissionCode"
+                jdbcType="VARCHAR"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, permission_name, menu_id, permission_desc, permission_code
+    </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap"
+            parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from admin_permission
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <select id="selectPermissionsByUser" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM
+        admin_permission
+        WHERE
+        id IN(
+        SELECT
+        apr.permission_id
+        FROM
+        admin_role_relate_permission apr,
+        admin_role ar,
+        admin_user_relate_role aurr
+        WHERE
+        apr.role_id = ar.id
+        and ar.id = aurr.role_id
+        and aurr.user_id = #{id,jdbcType=INTEGER}
+        )
+    </select>
+
+
+    <select id="findAdminPermissionByPage" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from admin_permission where 1=1
+        <if test="params.menuId != null and params.menuId !=''">
+            and menu_id = #{params.menuId}
+        </if>
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete from admin_permission
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+    <delete id="deleteByMenuId" parameterType="int">
+        delete from admin_permission
+        where menu_id=#{menuId,jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" parameterType="com.icaopan.admin.model.AdminPermission">
+        insert into admin_permission (id, permission_name, menu_id,
+        permission_desc, permission_code)
+        values (#{id,jdbcType=INTEGER}, #{permissionName,jdbcType=VARCHAR},
+        #{menuId,jdbcType=VARCHAR},
+        #{permissionDesc,jdbcType=VARCHAR}, #{permissionCode,jdbcType=VARCHAR})
+    </insert>
+    <insert id="insertSelective" parameterType="com.icaopan.admin.model.AdminPermission">
+        insert into admin_permission
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="permissionName != null">
+                permission_name,
+            </if>
+            <if test="menuId != null">
+                menu_id,
+            </if>
+            <if test="permissionDesc != null">
+                permission_desc,
+            </if>
+            <if test="permissionCode != null">
+                permission_code,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="permissionName != null">
+                #{permissionName,jdbcType=VARCHAR},
+            </if>
+            <if test="menuId != null">
+                #{menuId,jdbcType=VARCHAR},
+            </if>
+            <if test="permissionDesc != null">
+                #{permissionDesc,jdbcType=VARCHAR},
+            </if>
+            <if test="permissionCode != null">
+                #{permissionCode,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.icaopan.admin.model.AdminPermission">
+        update admin_permission
+        <set>
+            <if test="permissionName != null">
+                permission_name = #{permissionName,jdbcType=VARCHAR},
+            </if>
+            <if test="menuId != null">
+                menu_id = #{menuId,jdbcType=VARCHAR},
+            </if>
+            <if test="permissionDesc != null">
+                permission_desc = #{permissionDesc,jdbcType=VARCHAR},
+            </if>
+            <if test="permissionCode != null">
+                permission_code = #{permissionCode,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.icaopan.admin.model.AdminPermission">
+        update admin_permission
+        set permission_name = #{permissionName,jdbcType=VARCHAR},
+        menu_id = #{menuId,jdbcType=VARCHAR},
+        permission_desc = #{permissionDesc,jdbcType=VARCHAR},
+        permission_code = #{permissionCode,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+</mapper>

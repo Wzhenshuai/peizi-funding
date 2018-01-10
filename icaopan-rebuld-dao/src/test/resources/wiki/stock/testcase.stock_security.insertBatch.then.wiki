@@ -1,0 +1,16 @@
+|connect|
+
+|query|select * from stock_security|
+|internal_security_id|exchange_code|code|name|suspension_flag|first_letter|
+|2800308|64210|003248|大新闻|1|BNS|
+|601208|601210|004388|香港记者|1|HKIW|
+|603308|600010|000888|峨眉山|1|EMS|
+|603378|600110|005888|长者|1|JZM|
+|613308|607310|008988|谈笑风生|1|TSFS|
+|603309|609010|000088|盐田港|1|YTG|
+|0009220|XSHE|null|ta苹果^&F|0|PG|
+|0009221|XSHE|null|ta苹果^&I|0|PG|
+|0009222|XSHE|null|ta苹果^&L|0|PG|
+|0009223|XSHE|null|ta苹果^&O|0|PG|
+|0009224|XSHE|null|ta苹果^&R|0|PG|
+

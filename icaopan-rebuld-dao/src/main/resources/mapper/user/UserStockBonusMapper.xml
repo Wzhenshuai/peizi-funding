@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.icaopan.user.dao.UserStockBonusMapper">
+    <resultMap id="BaseResultMap" type="com.icaopan.user.model.UserStockBonus">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="user_id" jdbcType="INTEGER" property="userId"/>
+        <result column="user_name" jdbcType="VARCHAR" property="userName"/>
+        <result column="channel_security_position_id" jdbcType="INTEGER" property="channelSecurityPositionId"/>
+        <result column="channel_name" jdbcType="VARCHAR" property="channelName"/>
+        <result column="security_name" jdbcType="VARCHAR" property="securityName"/>
+        <result column="security_code" jdbcType="VARCHAR" property="securityCode"/>
+        <result column="security_position_amount" jdbcType="DECIMAL" property="securityPositionAmount"/>
+        <result column="bonus_broker_adjust_amount" jdbcType="DECIMAL" property="bonusBrokerAdjustAmount"/>
+        <result column="bonus_adjust_amount" jdbcType="DECIMAL" property="bonusAdjustAmount"/>
+        <result column="security_adjust_amount" jdbcType="DECIMAL" property="securityAdjustAmount"/>
+        <result column="status" jdbcType="INTEGER" property="status"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.icaopan.user.model.UserStockBonus" useGeneratedKeys="true" keyProperty="id">
+        insert into user_stock_bonus ( user_id,user_name,channel_security_position_id,
+        channel_name,
+        security_name,
+        security_code,
+        security_position_amount,
+        bonus_broker_adjust_amount,
+        bonus_adjust_amount,
+        security_adjust_amount,
+        status,
+        create_time,
+        remark
+        )
+        values (#{userId,jdbcType=INTEGER},
+        #{userName,jdbcType=VARCHAR},
+        #{channelSecurityPositionId,jdbcType=INTEGER},
+        #{channelName,jdbcType=VARCHAR},
+        #{securityName,jdbcType=VARCHAR},
+        #{securityCode,jdbcType=VARCHAR},
+        #{securityPositionAmount,jdbcType=DECIMAL},
+        #{bonusBrokerAdjustAmount,jdbcType=DECIMAL},
+        #{bonusAdjustAmount,jdbcType=DECIMAL},
+        #{securityAdjustAmount,jdbcType=DECIMAL},
+        #{status,jdbcType=INTEGER},
+        now(),
+        #{remark,jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <select id="findByPage" resultMap="BaseResultMap">
+        select *
+        from user_stock_bonus
+        where 1=1
+        <if test="params.securityCode!=null and params.securityCode!=''">
+            and security_code=#{params.securityCode}
+        </if>
+        <if test="params.statusList!=null">
+            and status in
+            <foreach collection="params.statusList" item="sta" index="index"
+                     open="(" close=")" separator=",">
+                #{sta}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="findById" resultMap="BaseResultMap">
+        select *
+        from user_stock_bonus
+        where id=#{id:INTEGER}
+    </select>
+
+    <select id="findAllToDeal" resultMap="BaseResultMap">
+        select *
+        from user_stock_bonus
+        where status = 1
+    </select>
+
+    <update id="updateStatus">
+        update user_stock_bonus set status=#{status:INTEGER},remark=#{remark:VARCHAR} where id=#{id:INTEGER} and status=1
+    </update>
+</mapper>

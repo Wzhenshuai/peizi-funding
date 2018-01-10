@@ -1,0 +1,10 @@
+|connect|
+|query|select * from user|
+|user_name|real_name|password|status|login_count|is_default_fee|channel_id|customer_id|
+|royLCO-A|Clo-A|Adas21#$A|2|0|0|2|0|
+|royLCO-D|Clo-D|Ddas21#$D|0|0|1|1|1|
+|royLCO-G|Clo-G|Gdas21#$G|1|0|1|2|2|
+|royLCO-J|Clo-J|Jdas21#$J|2|0|1|1|3|
+|royLCO-M|Clo-M|Mdas21#$M|0|7|1|2|1|
+
+

@@ -1,0 +1,13 @@
+|connect|
+|clean table|stock_security|
+
+|insert|stock_security|
+|internal_security_id|exchange_code|code|name|suspension_flag|first_letter|
+|2800308|64210|003248|大新闻|0|BNS|
+|601208|601210|004388|香港记者|0|HKIW|
+|603308|600010|000888|峨眉山|1|EMS|
+|603378|600110|005888|长者|0|JZM|
+|613308|607310|008988|谈笑风生|1|TSFS|
+|603309|609010|000088|盐田港|0|YTG|
+
+|commit|

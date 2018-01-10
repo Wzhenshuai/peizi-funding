@@ -1,0 +1,5 @@
+|connect|
+
+|query|select * from admin_role|
+|rolename|roledesc|
+|lisi|lisi|

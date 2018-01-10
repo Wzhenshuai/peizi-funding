@@ -1,0 +1,5 @@
+|connect|
+
+|query|select * from customer|
+|id|name|notes|status|cost_pattern|min_cost|default_tatio|default_min_cost|
+|101|zezeze|客户管理更新|1|0|300.00|0.00040000|2000000.00|

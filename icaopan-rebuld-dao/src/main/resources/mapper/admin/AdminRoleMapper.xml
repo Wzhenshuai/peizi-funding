@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.icaopan.admin.dao.AdminRoleMapper">
+    <resultMap id="BaseResultMap" type="com.icaopan.admin.model.AdminRole">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="rolename" property="rolename" jdbcType="VARCHAR"/>
+        <result column="roledesc" property="roledesc" jdbcType="VARCHAR"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, rolename, roledesc
+    </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from admin_role
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <select id="findAdminRoles" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from admin_role where 1=1
+        <if test='params.roleName != null'>
+            and rolename like #{params.roleName}
+        </if>
+    </select>
+
+    <select id="findAdminRolesForUser" resultType="hashmap">
+        SELECT
+        *
+        FROM
+        admin_role ar LEFT JOIN(
+        SELECT
+        *
+        FROM
+        admin_user_relate_role
+        WHERE
+        user_id = #{id,jdbcType=INTEGER}
+        ) aurr
+        ON ar.id = aurr.role_id
+    </select>
+    <select id="findRolesByUserId" resultMap="BaseResultMap">
+        SELECT
+        ar.*
+        FROM
+        admin_role ar,admin_user_relate_role aurr
+
+        WHERE ar.id = aurr.role_id
+        and user_id = #{userId}
+        group by ar.id
+        limit 1
+    </select>
+    
+    <select id="findAllRolesByUserId" resultMap="BaseResultMap">
+        SELECT
+        ar.*
+        FROM
+        admin_role ar,admin_user_relate_role aurr
+
+        WHERE ar.id = aurr.role_id
+        and user_id = #{userId}
+        group by ar.id
+    </select>
+    
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete from admin_role
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" parameterType="com.icaopan.admin.model.AdminRole">
+        insert into admin_role (id, rolename, roledesc
+        )
+        values (#{id,jdbcType=INTEGER}, #{rolename,jdbcType=VARCHAR}, #{roledesc,jdbcType=VARCHAR}
+        )
+    </insert>
+    <insert id="insertSelective" parameterType="com.icaopan.admin.model.AdminRole">
+        insert into admin_role
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="rolename != null">
+                rolename,
+            </if>
+            <if test="roledesc != null">
+                roledesc,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="rolename != null">
+                #{rolename,jdbcType=VARCHAR},
+            </if>
+            <if test="roledesc != null">
+                #{roledesc,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.icaopan.admin.model.AdminRole">
+        update admin_role
+        <set>
+            <if test="rolename != null">
+                rolename = #{rolename,jdbcType=VARCHAR},
+            </if>
+            <if test="roledesc != null">
+                roledesc = #{roledesc,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.icaopan.admin.model.AdminRole">
+        update admin_role
+        set rolename = #{rolename,jdbcType=VARCHAR},
+        roledesc = #{roledesc,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+</mapper>

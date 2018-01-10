@@ -1,0 +1,6 @@
+|connect|
+
+|query|select * from stock_security where internal_security_id='603308'|
+|internal_security_id|exchange_code|code|name|suspension_flag|first_letter|
+|603308|600010|000888|峨眉山|0|EMS|
+

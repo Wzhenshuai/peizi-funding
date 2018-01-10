@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.icaopan.trade.dao.FlowMapper">
+    <resultMap id="BaseResultMap" type="com.icaopan.trade.model.Flow">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="security_code" jdbcType="VARCHAR" property="securityCode"/>
+        <result column="security_name" jdbcType="VARCHAR" property="securityName"/>
+        <result column="adjust_quantity" jdbcType="DECIMAL" property="adjustQuantity"/>
+        <result column="adjust_amount" jdbcType="DECIMAL" property="adjustAmount"/>
+        <result column="type" jdbcType="VARCHAR" property="type"/>
+        <result column="user_name" jdbcType="VARCHAR" property="userName"/>
+        <result column="name" jdbcType="VARCHAR" property="customerName"/>
+        <result column="cash" jdbcType="DECIMAL" property="cash"/>
+        <result column="financing" jdbcType="DECIMAL" property="financing"/>
+        <result column="cash_amount" jdbcType="DECIMAL" property="cashAmount"/>
+        <result column="financing_amount" jdbcType="DECIMAL" property="financingAmount"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="user_id" jdbcType="INTEGER" property="userId"/>
+        <result column="notes" jdbcType="VARCHAR" property="notes"/>
+        <result column="customer_id" jdbcType="INTEGER" property="customerId"/>
+        <result column="commission_fee" jdbcType="DECIMAL" property="commissionFee"/>
+        <result column="stampduty_fee" jdbcType="DECIMAL" property="stampDutyFee"/>
+        <result column="transfer_fee" jdbcType="DECIMAL" property="transferFee"/>
+        <result column="channel_id" jdbcType="INTEGER" property="channelId"/>
+        <result column="cost_price" jdbcType="DECIMAL" property="costPrice"/>
+        <result column="change_cause" jdbcType="VARCHAR" property="changeCause"/>
+        <result column="is_hidden" jdbcType="CHAR" property="isHidden"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, security_code, adjust_quantity, adjust_amount, type, cash, financing,
+        cash_amount, financing_amount, create_time, user_id, notes, customer_id, channel_id, channel_name, cost_price,
+        change_cause,is_hidden
+    </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from trade_flow
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <select id="selectTradeFlowByPage" resultMap="BaseResultMap">
+        select
+        tf.id,
+        security_code,
+        adjust_quantity,
+        adjust_amount,
+        type,
+        cash,
+        financing,
+        tf.cash_amount,
+        financing_amount,
+        tf.create_time,
+        user_id,
+        tf.notes,
+        tf.customer_id,
+        u.user_name userName,
+        c.`name` customerName,
+        commission_fee,
+        stampduty_fee,
+        transfer_fee,
+        tc.name channelName,
+        cost_price,
+        change_cause,
+        is_hidden,
+        sc.name security_name
+        FROM
+        trade_flow tf
+        LEFT JOIN `user` u ON tf.user_id = u.id
+        LEFT JOIN customer c ON c.id = tf.customer_id
+        LEFT JOIN trade_channel tc ON tc.id = tf.channel_id
+        LEFT JOIN stock_security sc on sc.code=tf.security_code
+        where 1 = 1
+        <if test="params.securityCode != null and params.securityCode != '' ">
+            AND tf.security_code = #{params.securityCode}
+        </if>
+        <if test="params.type != null and params.type != '' ">
+            AND tf.type = #{params.type}
+        </if>
+        <if test="params.startTime != null and params.startTime != '' ">
+            <![CDATA[
+    		AND date(tf.create_time) >= date(#{params.startTime})
+    		]]>
+        </if>
+        <if test="params.endTime != null and params.startTime != '' ">
+            <![CDATA[
+    		AND date(tf.create_time) <= date(#{params.endTime})
+    		]]>
+        </if>
+        <if test="params.userName != null and params.userName != '' ">
+            AND u.user_name = #{params.userName}
+        </if>
+        <if test="params.customerId != null and params.customerId != '' ">
+            AND tf.customer_id = #{params.customerId}
+        </if>
+        <if test="params.userId != null and params.userId != '' ">
+            AND tf.user_id = #{params.userId}
+        </if>
+        <if test="params.isHidden != null">
+            AND tf.is_hidden = #{params.isHidden,jdbcType=CHAR}
+        </if>
+        ORDER BY tf.create_time DESC
+    </select>
+
+    <select id="selectFundFlowByPage" resultMap="BaseResultMap">
+        select
+        tf.id,
+        security_code,
+        adjust_quantity,
+        adjust_amount,
+        type,
+        cash,
+        financing,
+        tf.cash_amount,
+        financing_amount,
+        tf.create_time,
+        user_id,
+        tf.notes,
+        tf.customer_id,
+        u.user_name userName,
+        c.`name` customerName,
+        commission_fee,
+        stampduty_fee,
+        transfer_fee,
+        cost_price,
+        sc.name security_name
+        FROM
+        trade_flow tf
+        LEFT JOIN `user` u ON tf.user_id = u.id
+        LEFT JOIN customer c ON c.id = tf.customer_id
+        LEFT JOIN stock_security sc on sc.code=tf.security_code
+        where 1 = 1
+        <if test="params.securityCode != null and params.securityCode != '' ">
+            and tf.security_code = #{params.securityCode}
+        </if>
+        <if test="params.userId != null and params.userId != ''">
+            and tf.user_id = #{params.userId}
+        </if>
+        <if test="params.customerId != null and params.customerId != ''">
+            and tf.customer_id = #{params.customerId}
+        </if>
+        <if test="params.startTime != null and params.startTime != '' ">
+            <![CDATA[
+    		and date(tf.create_time) >= date(#{params.startTime})
+    		]]>
+        </if>
+        <if test="params.endTime != null and params.startTime != '' ">
+            <![CDATA[
+    		and date(tf.create_time) <= date(#{params.endTime})
+    		]]>
+        </if>
+        <choose>
+            <when test="params.type != null and params.type != '' ">
+                and tf.type = #{params.type}
+            </when>
+            <otherwise>
+                and tf.type in ('CASH_REDUCE','CASH_ADD','STOCK_ADD','STOCK_REDUCE')
+            </otherwise>
+        </choose>
+        <if test="params.type != null and params.type != '' ">
+
+        </if>
+        ORDER BY create_time DESC
+    </select>
+
+    <insert id="insert" parameterType="com.icaopan.trade.model.Flow">
+        insert into trade_flow (security_code, adjust_quantity,
+        adjust_amount, type, cash,
+        financing, cash_amount, financing_amount,
+        create_time, user_id, notes, customer_id,
+        channel_id, cost_price, change_cause,is_hidden
+        )
+        values (#{securityCode,jdbcType=VARCHAR}, #{adjustQuantity,jdbcType=DECIMAL},
+        #{adjustAmount,jdbcType=DECIMAL}, #{type,jdbcType=VARCHAR}, #{cash,jdbcType=DECIMAL},
+        #{financing,jdbcType=DECIMAL}, #{cashAmount,jdbcType=DECIMAL}, #{financingAmount,jdbcType=DECIMAL},
+        #{createTime,jdbcType=TIMESTAMP}, #{userId,jdbcType=INTEGER},#{notes,jdbcType=VARCHAR},
+        #{customerId,jdbcType=INTEGER},#{channelId,jdbcType=INTEGER}, #{costPrice,jdbcType=INTEGER},
+        #{changeCause,jdbcType=VARCHAR},#{isHidden}
+        )
+    </insert>
+    <insert id="insertList" parameterType="java.util.List">
+        insert into trade_flow (
+        security_code, adjust_quantity,
+        adjust_amount, type, cash,
+        financing, cash_amount, financing_amount,
+        create_time, user_id, notes, customer_id,
+        commission_fee,stampduty_fee,transfer_fee
+        )
+        values
+        <foreach collection="list" item="flow" index="index" open="(" separator="),(" close=")">
+            #{flow.securityCode,jdbcType=VARCHAR}, #{flow.adjustQuantity,jdbcType=DECIMAL},
+            #{flow.adjustAmount,jdbcType=DECIMAL}, #{flow.type,jdbcType=VARCHAR}, #{flow.cash,jdbcType=DECIMAL},
+            #{flow.financing,jdbcType=DECIMAL}, #{flow.cashAmount,jdbcType=DECIMAL},
+            #{flow.financingAmount,jdbcType=DECIMAL},
+            now(), #{flow.userId,jdbcType=INTEGER}, #{flow.notes,jdbcType=VARCHAR}, #{flow.customerId,jdbcType=INTEGER},
+            #{flow.commissionFee,jdbcType=DECIMAL},#{flow.stampDutyFee,jdbcType=DECIMAL},#{flow.transferFee,jdbcType=DECIMAL}
+        </foreach>
+    </insert>
+
+</mapper>

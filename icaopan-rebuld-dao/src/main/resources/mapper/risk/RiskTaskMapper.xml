@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.icaopan.risk.dao.RiskTaskMapper">
+    <resultMap id="BaseResultMap" type="com.icaopan.risk.bean.RiskMarketVO">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="internal_security_id" jdbcType="VARCHAR" property="securityId"/>
+        <result column="customer_id" jdbcType="INTEGER" property="customerId"/>
+        <result column="cost_price" jdbcType="DECIMAL" property="costPrice"/>
+        <result column="user_name" jdbcType="VARCHAR" property="userName"/>
+        <result column="user_id" jdbcType="INTEGER" property="userId"/>
+        <result column="real_name" jdbcType="VARCHAR" property="realName"/>
+        <result column="customer_name" jdbcType="VARCHAR" property="customerName"/>
+        <result column="warn_line" jdbcType="DECIMAL" property="warnLine"/>
+        <result column="open_line" jdbcType="DECIMAL" property="openLine"/>
+        <result column="status" jdbcType="VARCHAR" property="status"/>
+        <result column="single_stock_scale" javaType="DECIMAL" property="singleStockScale"/>
+        <result column="small_stock_scale" javaType="DECIMAL" property="smallStockScale"/>
+        <result column="create_stock_scale" javaType="DECIMAL" property="createStockScale"/>
+        <result column="small_single_stock_scale" javaType="DECIMAL" property="smallSingleStockScale"/>
+        <result column="create_single_stock_scale" javaType="DECIMAL" property="createSingleStockScale"/>
+        <result column="amount" jdbcType="DECIMAL" property="amount"/>
+        <result column="available" jdbcType="DECIMAL" property="available"/>
+        <result column="cash_amount" jdbcType="DECIMAL" property="cashAmount"/>
+        <result column="finance_amount" jdbcType="DECIMAL" property="financeAmount"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        a.id, a.internal_security_id, a.available positionAvailable, a.amount positionAmount, u.customer_id,
+        a.cost_price,u.user_name, a.user_id,
+        u.real_name, u.warn_line, u.open_line, u.status, u.single_stock_scale, u.small_stock_scale,
+        u.create_stock_scale,
+        u.small_single_stock_scale,u.create_single_stock_scale, u.amount, u.available,u.frozen AS "frozenAmount",
+        u.cash_amount, u.finance_amount, cu.name customer_name
+    </sql>
+    <sql id="userJoins">
+        LEFT JOIN customer cu on a.customer_id = cu.id
+        LEFT JOIN user u on a.user_id = u.id
+    </sql>
+
+    <select id="selectRiskMarketInfo" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from user_security_position a
+        <include refid="userJoins"/>
+        where u.status != 2
+    </select>
+
+    <sql id="User_Column_List">
+        u.id userId,
+        u.user_name,
+        u.real_name, u.warn_line, u.open_line, u.status, u.single_stock_scale, u.small_stock_scale,
+        u.create_stock_scale,
+        u.small_single_stock_scale,u.create_single_stock_scale, u.amount, u.available,u.frozen AS "frozenAmount",
+        u.cash_amount, u.finance_amount,
+        u.customer_id,
+        cu.name customer_name
+    </sql>
+    <sql id="userComplementaryJoins">
+        left join user_security_position usp on u.id = usp.user_id
+        left join customer cu on u.customer_id = cu.id
+    </sql>
+
+    <select id="selectPositionComplementary" resultMap="BaseResultMap">
+        select
+        <include refid="User_Column_List"/>
+        from user u
+        <include refid="userComplementaryJoins"/>
+        where u.status != 2
+        and usp.id is null
+    </select>
+    <select id="selectRiskMarketInfoByUserId" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from user_security_position a
+        <include refid="userJoins"/>
+        where a.user_id = #{userId}
+        and u.status != 2
+    </select>
+    <select id="selectSingleComplementary" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="User_Column_List"/>
+        from user u left join customer cu on u.customer_id = cu.id
+        where u.status != 2
+        and u.id = #{userId}
+    </select>
+</mapper>

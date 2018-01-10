@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.icaopan.user.dao.SelfStockMapper">
+    <resultMap id="BaseResultMap" type="com.icaopan.user.model.SelfStock">
+        <result column="id" property="id" jdbcType="VARCHAR"/>
+        <result column="userid" property="userid" jdbcType="VARCHAR"/>
+        <result column="stockcode" property="stockcode" jdbcType="VARCHAR"/>
+        <result column="stockname" property="stockname" jdbcType="VARCHAR"/>
+        <result column="stickflag" property="stickflag" jdbcType="VARCHAR"/>
+        <result column="lastmodifytime" property="lastmodifytime" jdbcType="TIMESTAMP"/>
+        <result column="groupid" property="groupid" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!-- 查询当前用户的自选股信息 -->
+    <select id="selectByUserid" resultMap="BaseResultMap">
+        SELECT id, userid, stockcode, stockname, stickflag, lastmodifytime, groupid FROM user_self_stock where userid =
+        #{userid} order by lastmodifytime desc ,stickflag desc
+    </select>
+
+    <!-- 保存自选股信息 -->
+    <insert id="save" parameterType="com.icaopan.user.model.SelfStock">
+        INSERT INTO user_self_stock(userid, stockcode, stockname, stickflag,lastmodifytime) VALUES(#{userid},
+        #{stockcode}, #{stockname}, '0',now())
+    </insert>
+
+    <!-- 删除自选股信息 -->
+    <delete id="deleteByStockCode">
+        DELETE FROM user_self_stock WHERE userid=#{userid} and stockcode like CONCAT('%',#{stockCode},'%')
+    </delete>
+
+    <delete id="deleteByUserId">
+        DELETE FROM user_self_stock WHERE userid=#{userid}
+    </delete>
+
+    <!-- 置顶排序 -->
+    <update id="topByStockCode">
+        UPDATE user_self_stock SET stickflag='1', lastmodifytime=now() WHERE userid=#{userid} and stockcode=#{stockCode}
+    </update>
+
+    <!-- 查询用户特定的自选股-->
+    <select id="selectByStockCode" resultMap="BaseResultMap">
+        SELECT id, userid, stockcode, stockname, stickflag, lastmodifytime, groupid FROM user_self_stock where
+        userid=#{userid} and stockcode=#{stockCode}
+    </select>
+
+
+</mapper>

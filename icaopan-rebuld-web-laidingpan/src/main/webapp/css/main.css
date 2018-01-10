@@ -1,0 +1,212 @@
+/**
+*主界面样式
+* waylau.com 2014-9-25
+*/
+/*公共样式*/
+iframe{
+	height:99%;
+}
+.f-l{
+	float:left;
+}
+.f-r{
+	float:right;
+}
+.bg-red{
+	background:#be0008;
+}
+.color_white{
+	color:#ffffff!important;
+}
+.m-b5{
+	margin-bottom:5px;
+}
+.m-r5{
+	margin-right:5px;
+}
+.m-t5{
+	margin-top:5px;
+}
+.pad5{
+	padding:5px;
+}
+.wb100{
+	width:100%!important;
+}
+.border0{
+	border:0px;
+}
+.v-textb{
+	vertical-align:text-bottom;
+}
+.bor-radius5{
+	border-radius:5px!important;
+}
+/*顶部区域样式*/
+.top-layout {
+    height: 60px;
+}
+
+.logo-text {
+    font-size:24px;
+    font-family:'SimHei' ;
+    display:inline-block;
+    color:#ffffff;
+}
+.top-left {
+    float:left;
+    height: 60px;
+    text-align: center;
+    position: relative;
+}
+
+.top-left img {
+    width: 50px;
+    height: 50px;
+    margin-top:5px;
+    border: 0
+}
+
+.top-right {
+    height: 60px;
+    float:right;
+    vertical-align: bottom;
+}
+
+.top-right .top-menu {
+    height: 22px;
+    margin-top: 34px;
+    margin-bottom: 0px;
+
+}
+
+/*左侧区域样式*/
+.left-layout {
+    width:15%;
+}
+
+
+/*左侧导航菜单样式*/
+.easyui-accordion .tree-list{list-style-type:none;margin:0px; padding:0px 2px;}
+.easyui-accordion .tree-list li{ padding:0px; background:#ebebeb;border-radius:5px;}
+.easyui-accordion .tree-list li a{
+	margin:2px 0px;
+	padding:5px 10px;
+	text-align: left;
+	border:0;
+	display:block;
+	background-color:#f5f3f3; 
+	border:#e4e4e4 solid 1px;
+	border-radius:5px;
+	color:#333;
+	text-decoration:none;
+	font-weight:bold;
+}
+.easyui-accordion .tree-list a:hover{
+	background:#e2e2e2!important;
+}
+.easyui-accordion .tree-list li a i{margin-right:5px;}
+.easyui-accordion .tree-list li ul{
+	list-style:none;
+	padding:0px 12px;
+	padding-right:0px;
+	margin:0px;
+}
+.easyui-accordion .tree-list li ul a{
+	background:#ebebeb!important;
+	font-weight:normal!important;
+	border:0px!important;
+}
+.easyui-accordion .tree-list .menu-change{
+	font-size:14px;
+	position:absolute;
+	right:10px;
+	line-height:15px;
+}
+/*底部区域样式*/
+.buttom-layout {
+    height:30px;
+}
+.buttom-left {
+    float: left;
+    padding-left: 5px;
+}
+.buttom-right {
+    float: right;
+    padding-right: 5px;
+}
+
+
+
+/*主题换肤样式*/
+
+.theme {
+      margin: 10px auto;
+}
+
+.theme img {
+    border: 0;
+}
+/*弹窗样式*/
+.add-menu{
+	padding:20px 5px;
+	margin-bottom:0px;
+}
+.add-menu label{
+	text-align:right !important;
+}
+.textbox-label{
+	width:20%;
+}
+
+.layoutheader  .panel-header{
+	border-left:0;
+	border-right:0;
+}
+.add label{
+	text-align:right!important;
+	width:20%;
+}
+.role-list .datagrid-wrap{
+	border-top:0px;
+	border-left:0px;
+}
+.list-border .datagrid-wrap{
+	border:0;
+}
+/*编辑按钮*/
+.edit-button{
+	display:inline-block;
+	font-family:"\5FAE\8F6F\96C5\9ED1";
+	padding:5px 10px;
+}
+.edit-button > .easyui-linkbutton{
+	border-radius:0px;
+	border-left:0px;
+	padding:0 10px;
+}
+
+ .edit-button .easyui-linkbutton:first-child{
+	border-top-left-radius:5px;
+	border-bottom-left-radius:5px;
+	border-left:1px solid #bbb;
+}
+.edit-button .easyui-linkbutton:last-child{
+	border-top-right-radius:5px;
+	border-bottom-right-radius:5px;
+}
+/*区域块外边框样式*/
+.block-style{
+	margin:10px; 
+	border:#ccc solid 1px; 
+	border-radius:5px;
+	overflow:auto;
+}
+.content-label label{
+	text-align:right!important;
+	width:10%;
+}
+.block-style .datagrid-wrap{
+	border-bottom:#ccc solid 1px!important;
+	border-right:0px!important;
+}

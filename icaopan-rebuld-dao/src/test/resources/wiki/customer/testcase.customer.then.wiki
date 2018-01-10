@@ -1,0 +1,5 @@
+|connect|
+
+|query|select * from customer|
+|name|notes|status|balance|cost_pattern|min_cost|default_tatio|default_min_cost|
+|wahaha|客户管理|0|100000.00|0|200.00|0.0003|1000000.00|
