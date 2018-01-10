@@ -1,0 +1,13 @@
+.classpath
+.project
+.class
+.war
+.zip
+.rar
+.idea
+*.iml
+*/target/*
+/src/main/webapp/WEB-INF/classes/*
+/target/
+*/test-output/*
+/.settings/

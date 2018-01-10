@@ -5,7 +5,7 @@
 + 个人分支(命名就随意啦)：每个人的开发都是在个人分支上面开发，想要合并的时候，合并一下自己的分支到开发分支(dev)上面就行...
 
 ##### 如图：
-![分支管理图](http://www.liaoxuefeng.com/files/attachments/001384909239390d355eb07d9d64305b6322aaf4edac1e3000/0)
+![分支管理图](http://www.liaoxuefeng.com)
 
 
 #### 远程调试ip及端口
